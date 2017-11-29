@@ -1,7 +1,3 @@
-//
-// Created by jlyskawa on 29.11.17.
-//
-
 #ifndef P2PFILESEXCHANGE_EXCEPTION_H
 #define P2PFILESEXCHANGE_EXCEPTION_H
 

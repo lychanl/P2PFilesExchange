@@ -1,7 +1,3 @@
-//
-// Created by jlyskawa on 29.11.17.
-//
-
 #ifndef P2PFILESEXCHANGE_IPV4ADDRESS_H
 #define P2PFILESEXCHANGE_IPV4ADDRESS_H
 

@@ -1,7 +1,3 @@
-//
-// Created by jlyskawa on 29.11.17.
-//
-
 #include "IPv4Address.h"
 #include "exception.h"
 
