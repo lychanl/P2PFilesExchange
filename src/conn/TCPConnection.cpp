@@ -1,25 +1,46 @@
-
 #include "TCPConnection.h"
 
 #include <unistd.h>
+#include <pthread.h>
+
+int connections = 0;
+pthread_mutex_t connectionsMutex;
+pthread_cond_t noConnectionsCond;
 
 using namespace conn;
 
 TCPConnection::TCPConnection(int socket, const IPv4Address& address) : socket(socket), remoteAddr(address)
 {
+	pthread_mutex_lock(&connectionsMutex);
+
+	connections++;
+
+	pthread_mutex_unlock(&connectionsMutex);
 }
 
 TCPConnection::TCPConnection(const IPv4Address& address) : remoteAddr(address)
 {
+	pthread_mutex_lock(&connectionsMutex);
+
 	if (createSocket() != 0)
 		return;
 
 	connect();
+
+	connections++;
+	pthread_mutex_unlock(&connectionsMutex);
 }
 
 TCPConnection::~TCPConnection()
 {
+	pthread_mutex_lock(&connectionsMutex);
+
 	close();
+
+	connections--;
+	if (connections == 0)
+		pthread_cond_signal(&noConnectionsCond);
+	pthread_mutex_unlock(&connectionsMutex);
 }
 
 int TCPConnection::createSocket()
@@ -53,7 +74,6 @@ int TCPConnection::connect()
 		status = STATUS_FATAL;
 		return -1;
 	}
-
 	return 0;
 }
 
@@ -148,4 +168,18 @@ int TCPConnection::recv(void *buffer, int n)
 		left -= received;
 		offset += received;
 	}
+}
+
+void TCPConnection::enableConnections()
+{
+	pthread_mutex_init(&connectionsMutex, nullptr);
+	pthread_cond_init(&noConnectionsCond, nullptr);
+}
+
+void TCPConnection::waitForAllClosed()
+{
+	pthread_mutex_lock(&connectionsMutex);
+	while (connections > 0)
+		pthread_cond_wait(&noConnectionsCond, &connectionsMutex);
+	pthread_mutex_unlock(&connectionsMutex);
 }

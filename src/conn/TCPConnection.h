@@ -40,6 +40,9 @@ namespace conn
 		// -1 if failed
 		int close();
 
+		static void waitForAllClosed();
+		static void enableConnections();
+
 		//Sends n bytes to remote
 		//Returns:
 		// 0 if ok
