@@ -55,7 +55,29 @@ unsigned short int IPv4Address::getPort() const
 	return this->port;
 }
 
-struct sockaddr_in IPv4Address::getSockaddr() const
+const struct sockaddr_in& IPv4Address::getSockaddr() const
 {
 	return this->sockAddr;
+}
+
+sockaddr_in IPv4Address::getAnyAddress(int port)
+{
+	sockaddr_in ret;
+
+	ret.sin_family = AF_INET;
+	ret.sin_addr.s_addr = htonl(INADDR_ANY);
+	ret.sin_port = htons(port);
+
+	return ret;
+}
+
+sockaddr_in IPv4Address::getBroadcastAddress(int port)
+{
+	sockaddr_in ret;
+
+	ret.sin_family = AF_INET;
+	ret.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	ret.sin_port = htons(port);
+
+	return ret;
 }
