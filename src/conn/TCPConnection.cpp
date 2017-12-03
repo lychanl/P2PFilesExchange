@@ -48,7 +48,7 @@ int TCPConnection::createSocket()
 	static sockaddr_in localaddr = IPv4Address::getAnyAddress(0);
 
 	socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (socket == 0)
+	if (socket <= 0)
 	{
 		error = errno;
 		status = STATUS_FATAL;
@@ -110,7 +110,7 @@ int TCPConnection::getError() const
 	return error;
 }
 
-Status TCPConnection::getStatus() const
+TCPConnection::Status TCPConnection::getStatus() const
 {
 	return status;
 }
@@ -176,7 +176,7 @@ void TCPConnection::enableConnections()
 	pthread_cond_init(&noConnectionsCond, nullptr);
 }
 
-void TCPConnection::waitForAllClosed()
+void TCPConnection::waitForNoConnections()
 {
 	pthread_mutex_lock(&connectionsMutex);
 	while (connections > 0)

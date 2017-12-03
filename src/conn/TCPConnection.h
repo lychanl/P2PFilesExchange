@@ -12,13 +12,13 @@ namespace conn
 	class TCPConnection
 	{
 	public:
-		enum Status
+		typedef enum
 		{
 			STATUS_OPEN,
 			STATUS_CLOSED,
 			STATUS_ERR, //an error occurred, but connection is kept open
 			STATUS_FATAL, //an error occured and connection is no longer open
-		};
+		} Status;
 
 		//Creates and opens connection
 		//Check status if error occured
@@ -26,8 +26,8 @@ namespace conn
 		//Creates connection using an already open socket
 		TCPConnection(int socket, const IPv4Address& address);
 
-		TCPConnection(TCPConnection& conn) : remoteAddr(0li, 0) { throw Exception("Forbidden!"); };
-		TCPConnection(TCPConnection&& conn) : remoteAddr(0li, 0) { throw Exception("Forbidden!"); };
+		TCPConnection(TCPConnection& conn) : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
+		TCPConnection(TCPConnection&& conn) : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
 
 		~TCPConnection();
 
@@ -40,7 +40,7 @@ namespace conn
 		// -1 if failed
 		int close();
 
-		static void waitForAllClosed();
+		static void waitForNoConnections();
 		static void enableConnections();
 
 		//Sends n bytes to remote
