@@ -1,5 +1,6 @@
 #include <conn/TCPServer.h>
-#include "conn/IPv4Address.h"
+#include "ui/UI.h"
+
 
 #include <unistd.h>
 #include <iostream>
@@ -7,16 +8,18 @@
 #define MSG "Test succeeded!"
 #define MSG_LEN sizeof MSG
 
+using namespace ui;
+using namespace std;
+
 void sHandler(conn::TCPConnection& conn)
 {
 	char buf[MSG_LEN];
 	conn.recv(buf, MSG_LEN);
-	std::cout << buf << std::endl;
+	cout << buf << endl;
 }
 
-int main()
+void testTCP()
 {
-	conn::TCPConnection::enableConnections();
 	conn::TCPServer server(6669, sHandler);
 
 	server.run();
@@ -31,7 +34,28 @@ int main()
 	}
 	server.stop();
 
+}
+
+int main()
+{
+	conn::TCPConnection::enableConnections();
+
+	UI userInterface = UI();
+
+	while(true)
+	{
+		string userInput;
+
+		// todo: actual prompt
+		cout << "P2P program prompt" << endl;
+
+		cin >> userInput;
+
+		userInterface.parseUserInput(userInput);
+	}
+
 	conn::TCPConnection::waitForNoConnections();
 
 	return 0;
+
 }
