@@ -120,14 +120,14 @@ const IPv4Address& TCPConnection::getRemoteAddress() const
 	return remoteAddr;
 }
 
-int TCPConnection::send(const void *buffer, int n)
+int TCPConnection::send(const void *buffer, size_t n)
 {
 	if (status == STATUS_CLOSED || status == STATUS_FATAL)
 		return -1;
 
-	int offset = 0;
-	int left = n;
-	int sent;
+	size_t offset = 0;
+	size_t left = n;
+	size_t sent;
 	while (left > 0)
 	{
 		sent = ::send(socket, buffer + offset, left, 0);
@@ -146,14 +146,14 @@ int TCPConnection::send(const void *buffer, int n)
 	return 0;
 }
 
-int TCPConnection::recv(void *buffer, int n)
+int TCPConnection::recv(void *buffer, size_t n)
 {
 	if (status == STATUS_CLOSED || status == STATUS_FATAL)
 		return -1;
 
-	int offset = 0;
-	int left = n;
-	int received;
+	size_t offset = 0;
+	size_t left = n;
+	size_t received;
 
 	while (left > 0)
 	{

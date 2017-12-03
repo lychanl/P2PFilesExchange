@@ -59,7 +59,7 @@ const struct sockaddr_in& IPv4Address::getSockaddr() const
 
 sockaddr_in IPv4Address::getAnyAddress(int port)
 {
-	sockaddr_in ret;
+	sockaddr_in ret{};
 
 	ret.sin_family = AF_INET;
 	ret.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -70,7 +70,7 @@ sockaddr_in IPv4Address::getAnyAddress(int port)
 
 sockaddr_in IPv4Address::getBroadcastAddress(int port)
 {
-	sockaddr_in ret;
+	sockaddr_in ret{};
 
 	ret.sin_family = AF_INET;
 	ret.sin_addr.s_addr = htonl(INADDR_BROADCAST);

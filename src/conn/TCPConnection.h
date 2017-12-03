@@ -22,12 +22,12 @@ namespace conn
 
 		//Creates and opens connection
 		//Check status if error occured
-		TCPConnection(const IPv4Address& address);
+		explicit TCPConnection(const IPv4Address& address);
 		//Creates connection using an already open socket
 		TCPConnection(int socket, const IPv4Address& address);
 
 		TCPConnection(TCPConnection& conn) : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
-		TCPConnection(TCPConnection&& conn) : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
+		TCPConnection(TCPConnection&& conn) noexcept : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
 
 		~TCPConnection();
 
@@ -47,12 +47,12 @@ namespace conn
 		//Returns:
 		// 0 if ok
 		// -1 if error
-		int send(const void* buffer, int n);
+		int send(const void* buffer, size_t n);
 		//Reads exactly n bytes from remote
 		//Returns:
 		// 0 if ok
 		// -1 if error
-		int recv(void* buffer, int n);
+		int recv(void* buffer, size_t n);
 
 		Status getStatus() const;
 		int getError() const;

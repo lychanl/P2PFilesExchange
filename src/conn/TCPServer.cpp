@@ -130,9 +130,7 @@ struct connectionThreadArg
 
 void* connectionThread(void* _arg)
 {
-	struct connectionThreadArg* arg = static_cast<struct connectionThreadArg*>(_arg);
-
-	*arg;
+	auto arg = static_cast<struct connectionThreadArg*>(_arg);
 
 	arg->handler(*arg->connection);
 
@@ -143,7 +141,7 @@ void* connectionThread(void* _arg)
 
 void* TCPServer::GlobalTCPServer::_run(void* _server)
 {
-	GlobalTCPServer* server = static_cast<GlobalTCPServer*>(_server);
+	auto server = static_cast<GlobalTCPServer*>(_server);
 
 	signalfd_siginfo siginfo;
 
@@ -176,7 +174,7 @@ void* TCPServer::GlobalTCPServer::_run(void* _server)
 		if (socket >= 0)
 		{
 			TCPConnection* conn = new TCPConnection(socket, IPv4Address(client));
-			struct connectionThreadArg* arg = new struct connectionThreadArg;
+			auto arg = new struct connectionThreadArg;
 
 			arg->connection = conn;
 			arg->handler = server->handler;
