@@ -2,10 +2,8 @@
 #include "TCPServer.h"
 
 #include <sys/signalfd.h>
-#include <sys/types.h>
 #include <csignal>
 #include <unistd.h>
-#include <pthread.h>
 
 #define ACCEPT_BUFFER_SIZE 256
 
@@ -16,22 +14,9 @@ TCPServer::TCPServer(unsigned short int port, connHandler handler)
 	this->server = new TCPServer::GlobalTCPServer(port, handler);
 }
 
-TCPServer::TCPServer(TCPServer &tcpServer)
-{
-	this->server = tcpServer.server;
-	this->server->newRef();
-}
-
-TCPServer::TCPServer(TCPServer &&tcpServer) noexcept
-{
-	this->server = tcpServer.server;
-	this->server->newRef();
-}
-
 TCPServer::~TCPServer()
 {
-	if (this->server->removeRef() == 0)
-		delete this->server;
+	delete this->server;
 }
 
 int TCPServer::run()
@@ -47,38 +32,19 @@ void TCPServer::stop()
 TCPServer::GlobalTCPServer::GlobalTCPServer(unsigned short int port, connHandler handler)
 {
 	bindAddress = IPv4Address::getAnyAddress(port);
-	this->references = 1;
 	this->running = false;
 	this->handler = handler;
-	pthread_mutex_init(&this->mutex, nullptr);
 }
 
-void TCPServer::GlobalTCPServer::newRef()
-{
-	pthread_mutex_lock(&this->mutex);
-	this->references++;
-	pthread_mutex_unlock(&this->mutex);
-}
-
-int TCPServer::GlobalTCPServer::removeRef()
-{
-	pthread_mutex_lock(&this->mutex);
-	int ret = --this->references;
-	if (ret == 0)
-		_stop();
-	pthread_mutex_unlock(&this->mutex);
-
-	return ret;
-}
 
 TCPServer::GlobalTCPServer::~GlobalTCPServer()
 {
-	pthread_mutex_destroy(&this->mutex);
+	if (this->running)
+		this->stop();
 }
 
 int TCPServer::GlobalTCPServer::run()
 {
-	pthread_mutex_lock(&this->mutex);
 	if (!running)
 	{
 		this->socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -112,14 +78,6 @@ int TCPServer::GlobalTCPServer::run()
 	}
 
 	running = true;
-	pthread_mutex_unlock(&this->mutex);
-}
-
-void TCPServer::GlobalTCPServer::stop()
-{
-	pthread_mutex_lock(&this->mutex);
-	_stop();
-	pthread_mutex_unlock(&this->mutex);
 }
 
 struct connectionThreadArg
@@ -196,7 +154,7 @@ void* TCPServer::GlobalTCPServer::_run(void* _server)
 
 }
 
-void TCPServer::GlobalTCPServer::_stop()
+void TCPServer::GlobalTCPServer::stop()
 {
 	pthread_kill(this->thread, SIGUSR1);
 

@@ -26,9 +26,6 @@ namespace conn
 		//Creates connection using an already open socket
 		TCPConnection(int socket, const IPv4Address& address);
 
-		TCPConnection(TCPConnection& conn) : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
-		TCPConnection(TCPConnection&& conn) noexcept : remoteAddr(0u, 0u) { throw Exception("Forbidden!"); };
-
 		~TCPConnection();
 
 		//Returns:
@@ -72,6 +69,10 @@ namespace conn
 		int error = 0;
 		IPv4Address remoteAddr;
 		int socket;
+
+		TCPConnection(TCPConnection& conn) : remoteAddr(0u, 0u) {};
+		TCPConnection(TCPConnection&& conn) noexcept : remoteAddr(0u, 0u) {};
+		TCPConnection& operator=(const TCPConnection& conn) {};
 	};
 }
 

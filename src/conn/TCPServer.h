@@ -15,13 +15,15 @@ namespace conn
 		//creates new server
 		//that listens on given port
 		TCPServer(unsigned short int port, connHandler handler);
-		TCPServer(TCPServer& tcpServer);
-		TCPServer(TCPServer&& tcpServer) noexcept;
 		int run();
 		void stop();
 		~TCPServer();
 
 	private:
+		TCPServer(TCPServer& tcpServer) {};
+		TCPServer(TCPServer&& tcpServer) noexcept {};
+		TCPServer& operator=(const TCPServer& tcpServer) {};
+
 		class GlobalTCPServer
 		{
 		public:
@@ -29,10 +31,6 @@ namespace conn
 			int run();
 			void stop();
 
-			void newRef();
-			//Returns number of remaining references
-			//If none and server is running stops server
-			int removeRef();
 			~GlobalTCPServer();
 		private:
 			connHandler handler;
@@ -41,11 +39,8 @@ namespace conn
 			struct sockaddr_in bindAddress;
 
 			static void* _run(void* server);
-			void _stop();
 
-			pthread_mutex_t mutex;
 			pthread_t thread;
-			int references;
 			bool running;
 		};
 
