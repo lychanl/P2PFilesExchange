@@ -3,38 +3,72 @@
 
 using namespace ui;
 
-void UI::parseUserInput(const std::string &inputString)
+int UI::parseUserInput(const std::string &inputString)
 {
-    if (inputString.substr(0, 7) == "-connect")
+    if (inputString.substr(0, 8) == "-connect")
     {
         char * substrEnd;
         long int mask;
 
-        if ((mask = strtol(inputString.substr(9, 2).c_str(), &substrEnd, 10)) == 0)
+        if ((inputString.length() < 15))
         {
-            throw Exception("Invalid mask " + inputString.substr(9, 2));
+            cout << "Invalid command" << endl;
+            return -1;
         }
 
-        parser.connect(mask, inputString.substr(13, inputString.length() - 13));
+        if ((mask = strtol(inputString.substr(9, 2).c_str(), &substrEnd, 10)) == 0)
+        {
+            cout << "Invalid mask " + inputString.substr(9, 2) << endl;
+            return -2;
+        }
+
+        return parser.connect(mask, inputString.substr(13, inputString.length() - 13));
     }
-    else if (inputString.substr(0, 10) == "-disconnect")
+    else if (inputString.substr(0, 11) == "-disconnect")
     {
-        parser.disconnect();
+       return parser.disconnect();
     }
     else if(inputString.substr(0, 7) == "-upload")
     {
-        string filename = inputString.substr(9, inputString.length() - 9);
-        parser.uploadFile(filename);
+        string filename;
+
+        if (inputString.length() < 9)
+        {
+            cout << "Invalid command" << endl;
+            return -3;
+        }
+
+        filename = inputString.substr(8, inputString.length() - 8);
+
+        return parser.uploadFile(filename);
     }
     else if(inputString.substr(0, 7) == "-delete")
     {
-        string filename = inputString.substr(9, inputString.length() - 9);
-        parser.deleteFile(filename);
+        string filename;
+
+        if (inputString.length() < 9)
+        {
+            cout << "Invalid command" << endl;
+            return -4;
+        }
+
+        filename = inputString.substr(8, inputString.length() - 8);
+
+        return parser.deleteFile(filename);
     }
     else if(inputString.substr(0, 9) == "-download")
     {
-        string filename = inputString.substr(9, inputString.length() - 11);
-        parser.downloadFile(filename);
+        string filename;
+
+        if (inputString.length() < 11)
+        {
+            cout << "Invalid command" << endl;
+            return -5;
+        }
+
+        filename = inputString.substr(10, inputString.length() - 10);
+
+        return parser.downloadFile(filename);
     }
     else if(inputString == "-la")
     {
@@ -56,10 +90,30 @@ void UI::parseUserInput(const std::string &inputString)
         cout << "-la" << endl;
         cout << "-l" << endl;
     }
+    return 0;
 }
 
 UI::UI() {
     parser = Parser();
+}
+
+int UI::start()
+{
+    string userInput;
+
+    cout << "TIN P2P project" << endl;
+    cout << "Created by: " << endl;
+    cout << "Jakub Łyskawa" << endl;
+    cout << "Agata Kłoss" << endl;
+    cout << "Robert Piwowarek" << endl;
+
+    do
+    {
+        cout << "Enter command:" << endl;
+
+        getline(cin, userInput);
+
+    } while(parseUserInput(userInput) != DISCONNECT_RETURN_VALUE);
 }
 
 int UI::Parser::connect(long int mask, const std::string &address)
@@ -68,7 +122,7 @@ int UI::Parser::connect(long int mask, const std::string &address)
 }
 
 int UI::Parser::disconnect() {
-    return 0;
+    return DISCONNECT_RETURN_VALUE;
 }
 
 int UI::Parser::uploadFile(string file) {

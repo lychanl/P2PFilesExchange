@@ -13,9 +13,13 @@ namespace ui
     public:
         UI();
 
-        void parseUserInput(const std::string& inputString);
+        int parseUserInput(const std::string& inputString);
+
+        int start();
 
     private:
+        static const int DISCONNECT_RETURN_VALUE = 200;
+
         class Parser
         {
         public:
