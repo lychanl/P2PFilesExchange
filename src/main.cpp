@@ -24,22 +24,20 @@ void testTCP()
 
 	server.run();
 
-	{
-		auto addr = conn::IPv4Address(INADDR_LOOPBACK, 6669);
+	auto addr = conn::IPv4Address(INADDR_LOOPBACK, 6669);
 
-		conn::TCPConnection c(addr);
+	conn::TCPConnection c(addr);
 
-		c.send(MSG, MSG_LEN);
-		c.close();
-	}
+	c.send(MSG, MSG_LEN);
+	c.close();
+
 	server.stop();
-
 }
 
 int main()
 {
 	conn::TCPConnection::enableConnections();
-
+/*
 	UI userInterface = UI();
 
 	while(true)
@@ -53,7 +51,7 @@ int main()
 
 		userInterface.parseUserInput(userInput);
 	}
-
+*/	testTCP();
 	conn::TCPConnection::waitForNoConnections();
 
 	return 0;

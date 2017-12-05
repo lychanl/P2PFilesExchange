@@ -20,27 +20,17 @@ TCPConnection::TCPConnection(int socket, const IPv4Address& address) : socket(so
 
 TCPConnection::TCPConnection(const IPv4Address& address) : remoteAddr(address)
 {
-	pthread_mutex_lock(&connectionsMutex);
-
 	if (createSocket() != 0)
+	{
 		return;
+	}
 
 	connect();
-
-	connections++;
-	pthread_mutex_unlock(&connectionsMutex);
 }
 
 TCPConnection::~TCPConnection()
 {
-	pthread_mutex_lock(&connectionsMutex);
-
 	close();
-
-	connections--;
-	if (connections == 0)
-		pthread_cond_signal(&noConnectionsCond);
-	pthread_mutex_unlock(&connectionsMutex);
 }
 
 int TCPConnection::createSocket()
@@ -68,12 +58,21 @@ int TCPConnection::createSocket()
 
 int TCPConnection::connect()
 {
+	pthread_mutex_lock(&connectionsMutex);
+
 	if (::connect(socket, (struct sockaddr*) &remoteAddr.getSockaddr(), sizeof(sockaddr_in)) != 0)
 	{
+		pthread_mutex_unlock(&connectionsMutex);
+
 		error = errno;
 		status = STATUS_FATAL;
 		return -1;
 	}
+
+	connections++;
+
+	pthread_mutex_unlock(&connectionsMutex);
+
 	return 0;
 }
 
@@ -99,7 +98,18 @@ int TCPConnection::reconnect()
 int TCPConnection::close()
 {
 	if (socket != 0)
+	{
 		::close(socket);
+
+		pthread_mutex_lock(&connectionsMutex);
+
+		connections--;
+		if (connections == 0)
+			pthread_cond_signal(&noConnectionsCond);
+
+		pthread_mutex_unlock(&connectionsMutex);
+
+	}
 
 	socket = 0;
 	status = STATUS_CLOSED;
