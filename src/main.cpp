@@ -1,9 +1,5 @@
-#include <conn/TCPConnection.h>
+#include <conn/TCPServer.h>
 #include "ui/UI.h"
-
-
-#include <unistd.h>
-#include <iostream>
 
 using namespace ui;
 using namespace std;
@@ -12,23 +8,12 @@ int main()
 {
 	conn::TCPConnection::enableConnections();
 
+    UI userInterface = UI();
 
-	UI userInterface = UI();
+    userInterface.start();
 
-	while(true)
-	{
-		string userInput;
+    conn::TCPConnection::waitForNoConnections();
 
-		// todo: actual prompt
-		cout << "P2P program prompt" << endl;
-
-		cin >> userInput;
-
-		userInterface.parseUserInput(userInput);
-	}
-
-	conn::TCPConnection::waitForNoConnections();
-
-	return 0;
+    return 0;
 
 }
