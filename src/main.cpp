@@ -1,4 +1,6 @@
+#include <conn/TCPConnection.h>
 #include "ui/UI.h"
+
 
 #include <unistd.h>
 #include <iostream>
