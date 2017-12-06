@@ -10,74 +10,35 @@
 using namespace conn;
 
 TCPServer::TCPServer(unsigned short int port, connHandler handler)
+		: Server(static_cast<GlobalServer*>(new TCPServer::GlobalTCPServer(port, handler)))
 {
-	this->server = new TCPServer::GlobalTCPServer(port, handler);
-}
-
-TCPServer::~TCPServer()
-{
-	delete this->server;
-}
-
-int TCPServer::run()
-{
-	return this->server->run();
-}
-
-void TCPServer::stop()
-{
-	this->server->stop();
 }
 
 TCPServer::GlobalTCPServer::GlobalTCPServer(unsigned short int port, connHandler handler)
 {
 	bindAddress = IPv4Address::getAnyAddress(port);
-	this->running = false;
 	this->handler = handler;
 }
 
-
-TCPServer::GlobalTCPServer::~GlobalTCPServer()
+int TCPServer::GlobalTCPServer::initSocket()
 {
-	if (this->running)
-		this->stop();
-}
+	int ret = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-int TCPServer::GlobalTCPServer::run()
-{
-	if (!running)
+	if (ret < 0) return -1;
+
+	if (::bind(ret, reinterpret_cast<sockaddr *>(&this->bindAddress), sizeof(this->bindAddress)) < 0)
 	{
-		this->socket = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-		if (socket < 0) return -1;
-
-		if (::bind(this->socket, (sockaddr *) &this->bindAddress, sizeof(this->bindAddress)) < 0)
-		{
-			close(this->socket);
-			return -1;
-		}
-
-		if (::listen(this->socket, ACCEPT_BUFFER_SIZE) < 0)
-		{
-			close(this->socket);
-			return -1;
-		}
-
-		sigset_t mask;
-		sigemptyset(&mask);
-		sigaddset(&mask, SIGUSR1);
-		sigfd = ::signalfd(-1, &mask, SFD_NONBLOCK);
-
-		if (sigfd < 0)
-		{
-			close(this-> socket);
-			return -1;
-		}
-
-		pthread_create(&this->thread, nullptr, _run, this);
+		close(ret);
+		return -1;
 	}
 
-	running = true;
+	if (::listen(ret, ACCEPT_BUFFER_SIZE) < 0)
+	{
+		close(ret);
+		return -1;
+	}
+
+	return ret;
 }
 
 struct connectionThreadArg
@@ -97,69 +58,30 @@ void* connectionThread(void* _arg)
 	delete arg;
 }
 
-void* TCPServer::GlobalTCPServer::_run(void* _server)
+int TCPServer::GlobalTCPServer::_run(int socketToRead)
 {
-	auto server = static_cast<GlobalTCPServer*>(_server);
 
-	signalfd_siginfo siginfo;
+	sockaddr_in client;
+	socklen_t clSize = sizeof(sockaddr_in);
 
-	sigset_t mask;
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR1);
+	int socket = ::accept4(socketToRead, reinterpret_cast<sockaddr *>(&client), &clSize, SOCK_NONBLOCK);
 
-	pthread_sigmask(SIG_BLOCK, &mask, nullptr);
-
-	fd_set fds;
-
-	FD_ZERO(&fds);
-	FD_SET(server->socket, &fds);
-	FD_SET(server->sigfd, &fds);
-
-	int nfds = server->socket > server->sigfd ? server->socket : server->sigfd;
-
-	while (true)
+	if (socket >= 0)
 	{
-		//int fd = select(nfds, &fds, nullptr, nullptr, nullptr);
+		TCPConnection *conn = new TCPConnection(socket, IPv4Address(client));
+		auto arg = new struct connectionThreadArg;
 
-		//if (read(server->sigfd, &siginfo, sizeof(signalfd_siginfo)) > 0)
-		//	break;
+		arg->connection = conn;
+		arg->handler = handler;
 
-		sockaddr_in client;
-		socklen_t clSize = sizeof(sockaddr_in);
+		pthread_t thread;
 
-		int socket = accept(server->socket, reinterpret_cast<sockaddr*>(&client), &clSize);//::accept4(server->socket, reinterpret_cast<sockaddr*>(&client), &clSize, SOCK_NONBLOCK);
-
-		if (socket >= 0)
-		{
-			TCPConnection* conn = new TCPConnection(socket, IPv4Address(client));
-			auto arg = new struct connectionThreadArg;
-
-			arg->connection = conn;
-			arg->handler = server->handler;
-
-			pthread_t thread;
-
-			pthread_create(&thread, nullptr, connectionThread, arg);
-			pthread_detach(thread);
-		}
-		else
-		{
-			//manage errors (todo)
-		}
-
-		break;
+		pthread_create(&thread, nullptr, connectionThread, arg);
+		pthread_detach(thread);
+	} else
+	{
+		//manage errors (todo)
 	}
 
-	return nullptr;
-
-}
-
-void TCPServer::GlobalTCPServer::stop()
-{
-	pthread_kill(this->thread, SIGUSR1);
-
-	pthread_join(this->thread, nullptr);
-
-	close(sigfd);
-	close(socket);
+	return 0;
 }

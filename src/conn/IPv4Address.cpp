@@ -68,12 +68,12 @@ sockaddr_in IPv4Address::getAnyAddress(int port)
 	return ret;
 }
 
-sockaddr_in IPv4Address::getBroadcastAddress(int port)
+sockaddr_in IPv4Address::getBroadcastAddress(const IPv4Address& address, int mask, int port)
 {
 	sockaddr_in ret{};
 
 	ret.sin_family = AF_INET;
-	ret.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	ret.sin_addr.s_addr = htonl(address.address | ((2 << mask) - 1));
 	ret.sin_port = htons(port);
 
 	return ret;

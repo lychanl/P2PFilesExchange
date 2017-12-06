@@ -23,7 +23,7 @@ namespace conn
 		unsigned short int getPort() const;
 
 		static sockaddr_in getAnyAddress(int port);
-		static sockaddr_in getBroadcastAddress(int port);
+		static sockaddr_in getBroadcastAddress(const IPv4Address& address, int mask, int port);
 	private:
 		struct sockaddr_in sockAddr;
 		unsigned long int address;

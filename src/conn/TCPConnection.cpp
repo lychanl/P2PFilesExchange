@@ -60,7 +60,7 @@ int TCPConnection::connect()
 {
 	pthread_mutex_lock(&connectionsMutex);
 
-	if (::connect(socket, (struct sockaddr*) &remoteAddr.getSockaddr(), sizeof(sockaddr_in)) != 0)
+	if (::connect(socket, reinterpret_cast<const sockaddr*>(&remoteAddr.getSockaddr()), sizeof(sockaddr_in)) != 0)
 	{
 		pthread_mutex_unlock(&connectionsMutex);
 
@@ -83,7 +83,7 @@ int TCPConnection::reconnect()
 
 	if (socket == 0)
 	{
-		if (createSocket() != 0);
+		if (createSocket() != 0)
 			return -1;
 	}
 

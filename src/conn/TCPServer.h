@@ -3,11 +3,11 @@
 #define P2PFILESEXCHANGE_TCPSERVER_H
 
 #include "TCPConnection.h"
-#include <pthread.h>
+#include "Server.h"
 
 namespace conn
 {
-	class TCPServer
+	class TCPServer : public Server
 	{
 	public:
 		typedef void(*connHandler)(TCPConnection&);
@@ -15,33 +15,20 @@ namespace conn
 		//creates new server
 		//that listens on given port
 		TCPServer(unsigned short int port, connHandler handler);
-		int run();
-		void stop();
-		~TCPServer();
 
 	private:
-		TCPServer(TCPServer& tcpServer) {};
-		TCPServer(TCPServer&& tcpServer) noexcept {};
-		TCPServer& operator=(const TCPServer& tcpServer) {};
 
-		class GlobalTCPServer
+		class GlobalTCPServer : public Server::GlobalServer
 		{
 		public:
 			GlobalTCPServer(unsigned short int port, connHandler handler);
-			int run();
-			void stop();
-
-			~GlobalTCPServer();
 		private:
 			connHandler handler;
-			int socket;
-			int sigfd;
 			struct sockaddr_in bindAddress;
 
-			static void* _run(void* server);
+			int _run(int socketToRead);
 
-			pthread_t thread;
-			bool running;
+			int initSocket();
 		};
 
 		GlobalTCPServer* server = nullptr;
