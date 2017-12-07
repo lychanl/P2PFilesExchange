@@ -9,8 +9,9 @@ include_directories(src)
 
 add_subdirectory(src/conn)
 add_subdirectory(src/ui)
+add_subdirectory(src/files)
 
 add_executable(P2PFilesExchange src/main.cpp src/exception.cpp)
 target_link_libraries(P2PFilesExchange
-        conn ui
+        conn ui files
         ${CMAKE_THREAD_LIBS_INIT})
