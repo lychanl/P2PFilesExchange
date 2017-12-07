@@ -35,6 +35,10 @@ int UDPServer::GlobalUDPServer::initSocket()
 		return -1;
 	}
 
+	int bc = 1;
+
+	::setsockopt(ret, SOL_SOCKET, SO_BROADCAST, &bc, sizeof(bc));
+
 	return ret;
 }
 
@@ -61,4 +65,6 @@ int UDPServer::GlobalUDPServer::_run(int socketToRead)
 
 		this->handl(this->buffer, read, clAddr);
 	}
+
+	return 0;
 }
