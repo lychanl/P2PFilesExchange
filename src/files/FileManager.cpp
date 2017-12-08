@@ -19,7 +19,7 @@ int FileManager::deleteLocalFile(FileManager::FileId file)
 
 FileManager::Descriptor FileManager::getDescriptor(FileManager::FileId file) const
 {
-	return nullptr;
+	return {};
 }
 
 const conn::IPv4Address &FileManager::getOwner(FileManager::FileId file) const

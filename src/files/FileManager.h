@@ -12,8 +12,14 @@ namespace files
 	{
 	public:
 		typedef std::string FileId;
-		typedef void* Descriptor; // 64 byte descriptor for network communication
 		typedef std::vector<FileId> FileList;
+
+		struct Descriptor
+		{
+			unsigned long int owner;
+			uint64_t date;
+			char name[52];
+		};
 
 		FileManager();
 
