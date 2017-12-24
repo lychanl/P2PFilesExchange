@@ -3,11 +3,14 @@
 
 #include <iostream>
 #include <regex>
+#include <csignal>
 
 using namespace std;
 
 namespace ui
 {
+    extern bool interruptSignalFlag;
+
     class UI
     {
     public:
@@ -16,9 +19,12 @@ namespace ui
         int parseUserInput(const std::string& inputString);
 
         int start();
-
     private:
         static const int DISCONNECT_RETURN_VALUE = 200;
+
+        struct sigaction sigact;
+
+        void initSignals();
 
         class Parser
         {

@@ -3,8 +3,15 @@
 
 using namespace ui;
 
+bool ui::interruptSignalFlag = false;
+
 int UI::parseUserInput(const std::string &inputString)
 {
+    if (interruptSignalFlag)
+    {
+        return parser.disconnect();
+    }
+
     if (inputString.substr(0, 8) == "-connect")
     {
         char * substrEnd;
@@ -93,8 +100,10 @@ int UI::parseUserInput(const std::string &inputString)
     return 0;
 }
 
-UI::UI() {
+UI::UI()
+{
     parser = Parser();
+    initSignals();
 }
 
 int UI::start()
@@ -121,28 +130,52 @@ int UI::Parser::connect(long int mask, const std::string &address)
     return 0;
 }
 
-int UI::Parser::disconnect() {
+int UI::Parser::disconnect()
+{
+    std::cout << "disconnect" << std::endl;
     return DISCONNECT_RETURN_VALUE;
 }
 
-int UI::Parser::uploadFile(string file) {
+int UI::Parser::uploadFile(string file)
+{
     return 0;
 }
 
-int UI::Parser::deleteFile(string file) {
+int UI::Parser::deleteFile(string file)
+{
     return 0;
 }
 
-int UI::Parser::downloadFile(string file) {
+int UI::Parser::downloadFile(string file)
+{
     return 0;
 }
 
-void UI::Parser::listAll() {
+void UI::Parser::listAll()
+{
 
 }
 
-void UI::Parser::listLocal() {
+void UI::Parser::listLocal()
+{
 
 }
 
 UI::Parser::Parser() = default;
+
+void signalHandler(int sig)
+{
+    if (sig == SIGINT)
+    {
+        std::cout << "SIGINT" << std::endl;
+        ui::interruptSignalFlag = true;
+    }
+}
+
+void UI::initSignals()
+{
+    sigact.sa_handler = signalHandler;
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_flags = 0;
+    sigaction(SIGINT, &sigact, (struct sigaction *) nullptr);
+}
