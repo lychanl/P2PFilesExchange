@@ -26,6 +26,11 @@ File &File::operator=(Descriptor &desc)
 	return *this;
 }
 
+File::File() : node(0)
+{
+
+}
+
 LocalFile::LocalFile(conn::IPv4Address node) : File(node)
 {
 

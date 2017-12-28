@@ -39,6 +39,7 @@ namespace files
 	struct File : public Descriptor
 	{
 		explicit File(conn::IPv4Address node);
+		File();
 
 		File &operator=(Descriptor &desc);
 
@@ -55,6 +56,7 @@ namespace files
 	struct LocalFile : public File
 	{
 		explicit LocalFile(conn::IPv4Address node);
+		LocalFile() = default;
 
 		LocalFile &operator=(Descriptor &desc);
 

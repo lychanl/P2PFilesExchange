@@ -47,13 +47,13 @@ const LocalFile &FileList::findLocalFile(files::Descriptor file) const
 
 int FileList::addLocalFile(files::LocalFile &file)
 {
-	localFiles.emplace(file, file);
+	localFiles[file] = file;
 	return 0;
 }
 
 int FileList::addRemoteFile(files::File &file)
 {
-	remoteFiles.emplace(file, file);
+	remoteFiles[file] = file;
 	return 0;
 }
 
@@ -109,4 +109,16 @@ const std::vector<Descriptor> FileList::listAllLocal() const
 		f.push_back(it.first);
 	}
 	return f;
+}
+
+int FileList::deleteFromNode(unsigned long int nodeAddress)
+{
+	for(auto it = remoteFiles.begin(); it != remoteFiles.end(); ++it)
+	{
+		if(it->second.node.getAddress() == nodeAddress)
+		{
+			remoteFiles.erase(it++);
+		}
+	}
+	return 0;
 }
