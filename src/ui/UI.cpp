@@ -1,4 +1,5 @@
 #include <exception.h>
+#include <log/Logger.h>
 #include "UI.h"
 
 using namespace ui;
