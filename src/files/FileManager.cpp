@@ -67,12 +67,35 @@ const std::vector<Descriptor> FileManager::listLocalFiles()
 	return f;
 }
 
-int FileManager::addRemoteFile(Descriptor descriptor, conn::IPv4Address node)
+int FileManager::addRemoteFile(Descriptor descriptor, conn::IPv4Address node, unsigned long long int date)
 {
-	File f(node);
-	f = descriptor;
+	return addRemoteFiles({descriptor}, node, date);
+}
+
+int FileManager::addRemoteFiles(std::vector<Descriptor> descriptors, conn::IPv4Address node, unsigned long long int date)
+{
 	pthread_rwlock_wrlock(&fileListLock);
-	fileList.addRemoteFile(f);
+	auto it = listDates.find(node.getAddress());
+	if(it != listDates.end())
+	{
+		if(it->second > date) // older list, do nothing
+		{
+			pthread_rwlock_unlock(&fileListLock);
+			return 1;
+		}
+		else if(it->second < date) // new list, delete all descriptors from this node
+		{
+			fileList.deleteFromNode(it->first);
+		}
+	}
+	// if new or current list add/update date entry and descriptor entries
+	listDates[node.getAddress()] = date;
+	for(auto it : descriptors)
+	{
+		File f(node);
+		f = it;
+		fileList.addRemoteFile(f);
+	}
 	pthread_rwlock_unlock(&fileListLock);
 	return 0;
 }
@@ -81,6 +104,15 @@ int FileManager::removeRemoteFile(Descriptor descriptor)
 {
 	pthread_rwlock_wrlock(&fileListLock);
 	fileList.deleteRemoteFile(descriptor);
+	pthread_rwlock_unlock(&fileListLock);
+	return 0;
+}
+
+// for deadbody or something
+int FileManager::removeRemoteFilesFromNode(conn::IPv4Address node)
+{
+	pthread_rwlock_wrlock(&fileListLock);
+	fileList.deleteFromNode(node.getAddress());
 	pthread_rwlock_unlock(&fileListLock);
 	return 0;
 }
@@ -142,3 +174,5 @@ int FileManager::closeLocalFile(Descriptor file)
 	pthread_rwlock_unlock(&fileListLock);
 	return 0;
 }
+
+

@@ -22,6 +22,8 @@ namespace files
 
 		int deleteRemoteFile(Descriptor desc);
 
+		int deleteFromNode(unsigned long int nodeAddress);
+
 		const std::vector<Descriptor> listAll() const;
 
 		const std::vector<Descriptor> listAllLocal() const;
