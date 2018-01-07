@@ -2,17 +2,23 @@
 #define P2PFILESEXCHANGE_LOGGER_H
 
 #include <iostream>
+#include <mutex>
+#include <chrono>
 
 class Logger
 {
 public:
-    Logger(){};
+    Logger(){
+
+    };
 
     static Logger& getInstance()
     {
         static Logger instance;
         return instance;
     }
+
+    std::mutex loggerMutex;
 
     Logger(Logger const &) = delete;
 

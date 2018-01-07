@@ -128,6 +128,8 @@ int UI::start()
 
 int UI::Parser::connect(long int mask, const std::string &address)
 {
+    conn::IPv4Address connection(address);
+    
     return 0;
 }
 
@@ -139,6 +141,7 @@ int UI::Parser::disconnect()
 
 int UI::Parser::uploadFile(string file)
 {
+    fileManager->addDiskFile(file);
     return 0;
 }
 
@@ -149,20 +152,27 @@ int UI::Parser::deleteFile(string file)
 
 int UI::Parser::downloadFile(string file)
 {
+
     return 0;
 }
 
 void UI::Parser::listAll()
 {
-
+    fileManager->listAllFiles();
 }
 
 void UI::Parser::listLocal()
 {
-
+    fileManager->listLocalFiles();
 }
 
-UI::Parser::Parser() = default;
+UI::Parser::Parser() {
+    fileManager = new files::FileManager(conn::IPv4Address::getLocalAddress(0), "/localNode/files");
+}
+
+UI::Parser::~Parser() {
+    delete fileManager;
+}
 
 void signalHandler(int sig)
 {
@@ -179,4 +189,7 @@ void UI::initSignals()
     sigemptyset(&sigact.sa_mask);
     sigact.sa_flags = 0;
     sigaction(SIGINT, &sigact, (struct sigaction *) nullptr);
+}
+
+UI::~UI() {
 }

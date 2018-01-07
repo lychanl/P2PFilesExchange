@@ -4,6 +4,8 @@
 #include <iostream>
 #include <regex>
 #include <csignal>
+#include <files/FileManager.h>
+#include <conn/IPv4Address.h>
 
 using namespace std;
 
@@ -15,6 +17,8 @@ namespace ui
     {
     public:
         UI();
+
+        virtual ~UI();
 
         int parseUserInput(const std::string& inputString);
 
@@ -45,6 +49,11 @@ namespace ui
             void listAll();
             // -l
             void listLocal();
+
+            virtual ~Parser();
+
+        private:
+            files::FileManager *fileManager;
         };
 
         Parser parser;
