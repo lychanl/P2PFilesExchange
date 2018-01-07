@@ -4,6 +4,8 @@
 #include <iostream>
 #include <regex>
 #include <csignal>
+#include <files/FileManager.h>
+#include <conn/IPv4Address.h>
 
 using namespace std;
 
@@ -16,11 +18,15 @@ namespace ui
     public:
         UI();
 
+        virtual ~UI();
+
         int parseUserInput(const std::string& inputString);
 
         int start();
     private:
         static const int DISCONNECT_RETURN_VALUE = 200;
+
+        files::FileManager *fileManager;
 
         struct sigaction sigact;
 

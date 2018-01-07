@@ -104,6 +104,7 @@ int UI::parseUserInput(const std::string &inputString)
 UI::UI()
 {
     parser = Parser();
+    fileManager = new files::FileManager(conn::IPv4Address::getLocalAddress(0), "/localNode/files");
     initSignals();
 }
 
@@ -139,6 +140,7 @@ int UI::Parser::disconnect()
 
 int UI::Parser::uploadFile(string file)
 {
+    fileManager->addDiskFile(file);
     return 0;
 }
 
@@ -179,4 +181,8 @@ void UI::initSignals()
     sigemptyset(&sigact.sa_mask);
     sigact.sa_flags = 0;
     sigaction(SIGINT, &sigact, (struct sigaction *) nullptr);
+}
+
+UI::~UI() {
+    delete fileManager;
 }
