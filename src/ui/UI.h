@@ -26,8 +26,6 @@ namespace ui
     private:
         static const int DISCONNECT_RETURN_VALUE = 200;
 
-        files::FileManager *fileManager;
-
         struct sigaction sigact;
 
         void initSignals();
@@ -51,6 +49,11 @@ namespace ui
             void listAll();
             // -l
             void listLocal();
+
+            virtual ~Parser();
+
+        private:
+            files::FileManager *fileManager;
         };
 
         Parser parser;

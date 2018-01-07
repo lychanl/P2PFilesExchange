@@ -104,7 +104,6 @@ int UI::parseUserInput(const std::string &inputString)
 UI::UI()
 {
     parser = Parser();
-    fileManager = new files::FileManager(conn::IPv4Address::getLocalAddress(0), "/localNode/files");
     initSignals();
 }
 
@@ -129,6 +128,8 @@ int UI::start()
 
 int UI::Parser::connect(long int mask, const std::string &address)
 {
+    conn::IPv4Address connection(address);
+    
     return 0;
 }
 
@@ -151,20 +152,27 @@ int UI::Parser::deleteFile(string file)
 
 int UI::Parser::downloadFile(string file)
 {
+
     return 0;
 }
 
 void UI::Parser::listAll()
 {
-
+    fileManager->listAllFiles();
 }
 
 void UI::Parser::listLocal()
 {
-
+    fileManager->listLocalFiles();
 }
 
-UI::Parser::Parser() = default;
+UI::Parser::Parser() {
+    fileManager = new files::FileManager(conn::IPv4Address::getLocalAddress(0), "/localNode/files");
+}
+
+UI::Parser::~Parser() {
+    delete fileManager;
+}
 
 void signalHandler(int sig)
 {
@@ -184,5 +192,4 @@ void UI::initSignals()
 }
 
 UI::~UI() {
-    delete fileManager;
 }
