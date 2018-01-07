@@ -78,3 +78,13 @@ sockaddr_in IPv4Address::getBroadcastAddress(const IPv4Address& address, int mas
 
 	return ret;
 }
+
+sockaddr_in IPv4Address::getLocalAddress(int port)
+{
+	return localAddress.sockAddr;
+}
+
+void IPv4Address::setLocalAddress(const IPv4Address &address)
+{
+	localAddress = IPv4Address(address.address, 0);
+}
