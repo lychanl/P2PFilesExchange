@@ -33,7 +33,7 @@ namespace proto
 		Result connect(); //synchronous
 		void disconnect(); //synchronous
 		void missingNode(); //synchronous
-		Result getFile(const files::Descriptor& file); //synchronous
+		Result getFile(const files::Descriptor& file, int fd); //synchronous
 		Result deactivateFile(const files::Descriptor& file); //synchronous
 
 	private:

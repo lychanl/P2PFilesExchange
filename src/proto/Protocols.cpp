@@ -17,7 +17,7 @@ Protocols& Protocols::getInstance()
 	return *instance;
 }
 
-Result Protocols::connect()
+Protocols::Result Protocols::connect()
 { //TODO
 	return Result::OK;
 }
@@ -28,7 +28,7 @@ void Protocols::disconnect()
 void Protocols::missingNode()
 {} //TODO
 
-Result Protocols::getFile(const files::Descriptor &file)
+Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 { //TODO
 	return Result ::OK;
 }
@@ -36,7 +36,7 @@ Result Protocols::getFile(const files::Descriptor &file)
 void Protocols::uploadFile(const files::Descriptor &file)
 {} //TODO
 
-Result Protocols::deactivateFile(const files::Descriptor &file)
+Protocols::Result Protocols::deactivateFile(const files::Descriptor &file)
 { //TODO
 	return Result::OK;
 }
