@@ -6,6 +6,8 @@
 using namespace conn;
 using namespace std;
 
+IPv4Address IPv4Address::localAddress(INADDR_ANY, 0);
+
 IPv4Address::IPv4Address(unsigned long int address) : IPv4Address(address, 0)
 {
 }
@@ -81,7 +83,8 @@ sockaddr_in IPv4Address::getBroadcastAddress(const IPv4Address& address, int mas
 
 sockaddr_in IPv4Address::getLocalAddress(int port)
 {
-	return localAddress.sockAddr;
+	IPv4Address ret(localAddress.address, port);
+	return ret.sockAddr;
 }
 
 void IPv4Address::setLocalAddress(const IPv4Address &address)
