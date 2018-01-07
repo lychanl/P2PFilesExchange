@@ -6,7 +6,7 @@
 #include <csignal>
 #include <files/FileManager.h>
 #include <conn/IPv4Address.h>
-
+#include <proto/Protocols.h>
 using namespace std;
 
 namespace ui

@@ -128,14 +128,15 @@ int UI::start()
 
 int UI::Parser::connect(long int mask, const std::string &address)
 {
-    conn::IPv4Address connection(address);
-    
+    conn::IPv4Address::setLocalAddress(address);
+    proto::Protocols::getInstance().connect();
     return 0;
 }
 
 int UI::Parser::disconnect()
 {
     std::cout << "disconnect" << std::endl;
+    proto::Protocols::getInstance().disconnect();
     return DISCONNECT_RETURN_VALUE;
 }
 
@@ -147,23 +148,38 @@ int UI::Parser::uploadFile(string file)
 
 int UI::Parser::deleteFile(string file)
 {
+    for(auto a: fileManager->listAllFiles()) {
+        if (a.name == file){
+            proto::Protocols::getInstance().deactivateFile(a);
+            break;
+        }
+    }
     return 0;
 }
 
 int UI::Parser::downloadFile(string file)
 {
-
+    for(auto a: fileManager->listAllFiles()) {
+        if (a.name == file){
+            //proto::Protocols::getInstance().getFile(a, );
+            break;
+        }
+    }
     return 0;
 }
 
 void UI::Parser::listAll()
 {
-    fileManager->listAllFiles();
+    for(auto a: fileManager->listAllFiles()){
+        std::cout << a.owner << " " << a.name << " " << a.date << std::endl;
+    }
 }
 
 void UI::Parser::listLocal()
 {
-    fileManager->listLocalFiles();
+    for(auto a: fileManager->listLocalFiles()){
+        std::cout << a.owner << " " << a.name << " " << a.date << std::endl;
+    }
 }
 
 UI::Parser::Parser() {
