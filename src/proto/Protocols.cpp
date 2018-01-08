@@ -3,6 +3,8 @@
 
 using namespace proto;
 
+Protocols* Protocols::instance = nullptr;
+
 void Protocols::init(conn::UDPBroadcaster *broadcaster, files::FileManager *fileManager)
 {
 	instance = new Protocols();
