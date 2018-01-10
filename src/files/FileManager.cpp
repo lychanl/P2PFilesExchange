@@ -155,7 +155,7 @@ int FileManager::openLocalFile(Descriptor file)
 	pthread_mutex_lock(&f.mutex);
 	f.threadCount++;
 	pthread_mutex_unlock(&f.mutex);
-	fd = open(f.path.c_str(), O_RDWR);
+	fd = open(f.path.c_str(), O_RDONLY);
 	pthread_rwlock_unlock(&fileListLock);
 	return fd;
 }
