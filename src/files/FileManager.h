@@ -16,6 +16,7 @@ namespace files
 	public:
 
 		explicit FileManager(conn::IPv4Address localNode, std::string fileDir);
+		~FileManager();
 
 		int addDiskFile(const std::string &diskPath); // creates descriptor
 		int addDiskFile(Descriptor desc, const std::string &diskPath);

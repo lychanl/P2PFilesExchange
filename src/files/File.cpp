@@ -33,7 +33,7 @@ File::File() : node(0)
 
 LocalFile::LocalFile(conn::IPv4Address node) : File(node)
 {
-
+	pthread_mutex_init(&mutex, nullptr);
 }
 
 LocalFile &LocalFile::operator=(Descriptor &desc)
@@ -42,4 +42,9 @@ LocalFile &LocalFile::operator=(Descriptor &desc)
 	date = desc.date;
 	strncpy(name, desc.name, 52);
 	return *this;
+}
+
+LocalFile::~LocalFile()
+{
+	pthread_mutex_destroy(&mutex);
 }
