@@ -30,6 +30,7 @@ namespace files
 
 		int deactivateLocalFile(Descriptor file);
 		int makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode);
+		bool isActive(Descriptor localFile);
 
 		int openLocalFile(Descriptor file); // for reading
 		int closeLocalFile(Descriptor file);
@@ -48,8 +49,6 @@ namespace files
 		FileList fileList;
 		conn::IPv4Address localNode;
 		pthread_rwlock_t fileListLock;
-
-		bool isActive(Descriptor localFile);
 	};
 }
 
