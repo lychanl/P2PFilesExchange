@@ -48,6 +48,8 @@ namespace files
 		FileList fileList;
 		conn::IPv4Address localNode;
 		pthread_rwlock_t fileListLock;
+
+		bool isActive(Descriptor localFile);
 	};
 }
 

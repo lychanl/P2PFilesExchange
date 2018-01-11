@@ -202,3 +202,15 @@ int FileManager::makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode)
 	pthread_rwlock_unlock(&fileListLock);
 	return 0;
 }
+
+bool FileManager::isActive(Descriptor localFile)
+{
+	bool a;
+	pthread_rwlock_rdlock(&fileListLock);
+	LocalFile &f = fileList.findLocalFile(localFile);
+	pthread_mutex_lock(&f.mutex);
+	a = f.active;
+	pthread_mutex_unlock(&f.mutex);
+	pthread_rwlock_unlock(&fileListLock);
+	return a;
+}
