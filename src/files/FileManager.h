@@ -29,6 +29,7 @@ namespace files
 		int removeRemoteFilesFromNode(conn::IPv4Address node);
 
 		int deactivateLocalFile(Descriptor file);
+		int makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode);
 
 		int openLocalFile(Descriptor file); // for reading
 		int closeLocalFile(Descriptor file);

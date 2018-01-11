@@ -182,4 +182,23 @@ int FileManager::closeLocalFile(Descriptor file)
 	return 0;
 }
 
+int FileManager::makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode)
+{
+	pthread_rwlock_wrlock(&fileListLock);
+	LocalFile &f = fileList.findLocalFile(file);
+	File newF = f;
+	newF.node = newNode;
 
+	pthread_mutex_lock(&f.mutex);
+	f.active = false;
+	if (f.threadCount == 0)
+	{
+		pthread_mutex_unlock(&f.mutex);
+		remove(f.path.c_str());
+		fileList.deleteLocalFile(f); //delete from file list
+	}
+	else pthread_mutex_unlock(&f.mutex);
+	fileList.addRemoteFile(newF);
+	pthread_rwlock_unlock(&fileListLock);
+	return 0;
+}
