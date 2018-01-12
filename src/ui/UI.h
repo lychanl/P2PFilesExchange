@@ -35,19 +35,19 @@ namespace ui
         public:
             Parser();
 
-            // -connect mask address
+            // connect mask address
             int connect(const std::string& address);
-            // -disconnect
+            // disconnect
             int disconnect();
-            // -upload filename
+            // upload filename
             int uploadFile(string file);
-            // -delete filename
+            // delete filename
             int deleteFile(string file);
-            // -download filename
+            // download filename
             int downloadFile(string file);
-            // -la
+            // la
             void listAll();
-            // -l
+            // l
             void listLocal();
 
             virtual ~Parser();
