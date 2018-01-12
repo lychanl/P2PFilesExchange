@@ -19,6 +19,7 @@ namespace proto
 
 		virtual int getSerializedSize() = 0;
 
+		int getHeaderSize();
 	protected:
 		//must return size of the rest of the data to parse
 		virtual int parseHeader() = 0;

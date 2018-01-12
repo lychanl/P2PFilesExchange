@@ -57,13 +57,14 @@ namespace files
 	{
 		explicit LocalFile(conn::IPv4Address node);
 		LocalFile() = default;
+		~LocalFile();
 
 		LocalFile &operator=(Descriptor &desc);
 
 		int state;
-		bool active;
+		bool active = true;
 		std::string path;
-		size_t threadCount;
+		size_t threadCount = 0;
 		pthread_mutex_t mutex;
 	};
 }

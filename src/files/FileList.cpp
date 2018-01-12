@@ -113,12 +113,16 @@ const std::vector<Descriptor> FileList::listAllLocal() const
 
 int FileList::deleteFromNode(unsigned long int nodeAddress)
 {
+	std::vector<Descriptor> deleteMe;
 	for(auto it = remoteFiles.begin(); it != remoteFiles.end(); ++it)
 	{
 		if(it->second.node.getAddress() == nodeAddress)
 		{
-			remoteFiles.erase(it++);
+			deleteMe.push_back(it->first);
 		}
+	}
+	for(auto it : deleteMe) {
+		remoteFiles.erase(it);
 	}
 	return 0;
 }

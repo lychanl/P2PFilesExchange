@@ -92,3 +92,8 @@ void Package::put(void *data, int size, int offset)
 {
 	memcpy(this->data + offset, data, size);
 }
+
+int Package::getHeaderSize()
+{
+	return this->headerSize;
+}
