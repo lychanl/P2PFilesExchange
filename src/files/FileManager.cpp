@@ -257,6 +257,7 @@ bool FileManager::isActive(const Descriptor& localFile)
 		return a;
 	}
 	catch(std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
 		return false;
 	}
 }
