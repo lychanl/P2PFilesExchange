@@ -38,10 +38,10 @@ namespace files
 
 	struct File : public Descriptor
 	{
-		explicit File(conn::IPv4Address node);
+		explicit File(const conn::IPv4Address& node);
 		File();
 
-		File &operator=(Descriptor &desc);
+		File &operator=(const Descriptor &desc);
 
 		conn::IPv4Address node; // who stores it
 		bool operator==(const File &other) const;
@@ -55,11 +55,11 @@ namespace files
 	// extends File adding local-only fields
 	struct LocalFile : public File
 	{
-		explicit LocalFile(conn::IPv4Address node);
+		explicit LocalFile(const conn::IPv4Address& node);
 		LocalFile() = default;
 		~LocalFile();
 
-		LocalFile &operator=(Descriptor &desc);
+		LocalFile &operator=(const Descriptor &desc);
 
 		int state;
 		bool active = true;

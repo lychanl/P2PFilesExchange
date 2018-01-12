@@ -15,27 +15,27 @@ namespace files
 	{
 	public:
 
-		explicit FileManager(conn::IPv4Address localNode, std::string fileDir);
+		explicit FileManager(conn::IPv4Address localNode, const std::string& fileDir);
 		~FileManager();
 		// everything that returns int except openLocalFile will return 0 on success
 		int addDiskFile(const std::string &diskPath); // creates descriptor
-		int addDiskFile(Descriptor desc, const std::string &diskPath);
+		int addDiskFile(const Descriptor& desc, const std::string &diskPath);
 
 		// if the entry in listDates for this node has an older date, then all descriptors of this node will be erased
-		int addRemoteFile(Descriptor descriptor, conn::IPv4Address node, unsigned long long int date);
-		int addRemoteFiles(std::vector<Descriptor> descriptors, conn::IPv4Address node, unsigned long long int date);
+		int addRemoteFile(const Descriptor& descriptor, const conn::IPv4Address& node, unsigned long long int date);
+		int addRemoteFiles(const std::vector<Descriptor>& descriptors, const conn::IPv4Address& node, unsigned long long int date);
 
-		int removeRemoteFile(Descriptor descriptor);
-		int removeRemoteFilesFromNode(conn::IPv4Address node);
+		int removeRemoteFile(const Descriptor& descriptor);
+		int removeRemoteFilesFromNode(const conn::IPv4Address& node);
 
-		int deactivateLocalFile(Descriptor file);
-		int makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode);
-		bool isActive(Descriptor localFile);
+		int deactivateLocalFile(const Descriptor& file);
+		int makeLocalFileRemote(const Descriptor& file, const conn::IPv4Address& newNode);
+		bool isActive(const Descriptor& localFile);
 
-		int openLocalFile(Descriptor file); // for reading, returns -1 on failure
-		int closeLocalFile(Descriptor file);
+		int openLocalFile(const Descriptor& file); // for reading, returns -1 on failure
+		int closeLocalFile(const Descriptor& file);
 
-		const conn::IPv4Address getNode(Descriptor file);
+		const conn::IPv4Address getNode(const Descriptor& file);
 
 		const std::vector<Descriptor> listAllFiles();
 
