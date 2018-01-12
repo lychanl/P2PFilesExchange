@@ -16,8 +16,6 @@ int UI::parseUserInput(const std::string &inputString)
 
     if (inputString.substr(0, 7) == "connect")
     {
-        char * substrEnd;
-
         if ((inputString.length() <= 12))
         {
             cout << "Invalid adress" << endl;
