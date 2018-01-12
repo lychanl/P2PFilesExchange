@@ -17,7 +17,7 @@ namespace files
 
 		explicit FileManager(conn::IPv4Address localNode, std::string fileDir);
 		~FileManager();
-
+		// everything that returns int except openLocalFile will return 0 on success
 		int addDiskFile(const std::string &diskPath); // creates descriptor
 		int addDiskFile(Descriptor desc, const std::string &diskPath);
 
@@ -32,7 +32,7 @@ namespace files
 		int makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode);
 		bool isActive(Descriptor localFile);
 
-		int openLocalFile(Descriptor file); // for reading
+		int openLocalFile(Descriptor file); // for reading, returns -1 on failure
 		int closeLocalFile(Descriptor file);
 
 		const conn::IPv4Address getNode(Descriptor file);

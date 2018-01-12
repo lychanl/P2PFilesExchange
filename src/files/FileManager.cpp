@@ -50,9 +50,16 @@ int FileManager::addDiskFile(Descriptor file, const std::string &diskPath)
 const conn::IPv4Address FileManager::getNode(Descriptor file)
 {
 	pthread_rwlock_rdlock(&fileListLock);
-	conn::IPv4Address n = fileList.findFile(file).node;
-	pthread_rwlock_unlock(&fileListLock);
-	return n;
+	try
+	{
+		conn::IPv4Address n = fileList.findFile(file).node;
+		pthread_rwlock_unlock(&fileListLock);
+		return n;
+	}
+	catch(std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
+		return conn::IPv4Address(0);
+	}
 }
 
 const std::vector<Descriptor> FileManager::listAllFiles()
@@ -109,9 +116,15 @@ int FileManager::addRemoteFiles(std::vector<Descriptor> descriptors, conn::IPv4A
 int FileManager::removeRemoteFile(Descriptor descriptor)
 {
 	pthread_rwlock_wrlock(&fileListLock);
-	fileList.deleteRemoteFile(descriptor);
-	pthread_rwlock_unlock(&fileListLock);
-	return 0;
+	try
+	{
+		fileList.deleteRemoteFile(descriptor);
+		pthread_rwlock_unlock(&fileListLock);
+		return 0;
+	}
+	catch(std::out_of_range& e) {
+		return 1;
+	}
 }
 
 // for deadbody or something
@@ -124,26 +137,32 @@ int FileManager::removeRemoteFilesFromNode(conn::IPv4Address node)
 }
 
 
-// untested
 int FileManager::deactivateLocalFile(Descriptor file)
 {
 	pthread_rwlock_wrlock(&fileListLock);
-	LocalFile &f = fileList.findLocalFile(file);
-
-	pthread_mutex_lock(&f.mutex);
-	f.active = false;
-	if (f.threadCount == 0)
+	try
 	{
+		LocalFile &f = fileList.findLocalFile(file);
+
+		pthread_mutex_lock(&f.mutex);
+		f.active = false;
+		if (f.threadCount == 0)
+		{
+			pthread_mutex_unlock(&f.mutex);
+			remove(f.path.c_str());
+			fileList.deleteLocalFile(f); //delete from file list
+			pthread_rwlock_unlock(&fileListLock);
+			return 0;
+
+		}
 		pthread_mutex_unlock(&f.mutex);
-		remove(f.path.c_str());
-		fileList.deleteLocalFile(f); //delete from file list
 		pthread_rwlock_unlock(&fileListLock);
 		return 0;
-
 	}
-	pthread_mutex_unlock(&f.mutex);
-	pthread_rwlock_unlock(&fileListLock);
-	return 0;
+	catch(std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
+		return 1;
+	}
 }
 
 // returns fd open for reading
@@ -151,66 +170,93 @@ int FileManager::openLocalFile(Descriptor file)
 {
 	int fd;
 	pthread_rwlock_rdlock(&fileListLock);
-	LocalFile &f = fileList.findLocalFile(file);
-	pthread_mutex_lock(&f.mutex);
-	f.threadCount++;
-	pthread_mutex_unlock(&f.mutex);
-	fd = open(f.path.c_str(), O_RDONLY);
-	pthread_rwlock_unlock(&fileListLock);
-	return fd;
+	try
+	{
+		LocalFile &f = fileList.findLocalFile(file);
+		pthread_mutex_lock(&f.mutex);
+		f.threadCount++;
+		pthread_mutex_unlock(&f.mutex);
+		fd = open(f.path.c_str(), O_RDONLY);
+		pthread_rwlock_unlock(&fileListLock);
+		return fd;
+	}
+	catch(std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
+		return -1;
+	}
 }
 
 // close the fd yourself
 int FileManager::closeLocalFile(Descriptor file)
 {
 	pthread_rwlock_wrlock(&fileListLock); // wr because we might need to delete it
-	LocalFile &f = fileList.findLocalFile(file);
-
-	pthread_mutex_lock(&f.mutex);
-	f.threadCount--;
-	if (f.threadCount == 0 && !f.active)
+	try
 	{
+		LocalFile &f = fileList.findLocalFile(file);
+
+		pthread_mutex_lock(&f.mutex);
+		f.threadCount--;
+		if (f.threadCount == 0 && !f.active)
+		{
+			pthread_mutex_unlock(&f.mutex);
+			pthread_mutex_destroy(&f.mutex);
+			remove(f.path.c_str()); // at this point, no other thread should be waiting for it
+			fileList.deleteLocalFile(f); //delete from file list
+			pthread_rwlock_unlock(&fileListLock);
+			return 0;
+		}
 		pthread_mutex_unlock(&f.mutex);
-		pthread_mutex_destroy(&f.mutex);
-		remove(f.path.c_str()); // at this point, no other thread should be waiting for it
-		fileList.deleteLocalFile(f); //delete from file list
 		pthread_rwlock_unlock(&fileListLock);
 		return 0;
 	}
-	pthread_mutex_unlock(&f.mutex);
-	pthread_rwlock_unlock(&fileListLock);
-	return 0;
+	catch (std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
+		return 1;
+	}
 }
 
 int FileManager::makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode)
 {
 	pthread_rwlock_wrlock(&fileListLock);
-	LocalFile &f = fileList.findLocalFile(file);
-	File newF = f;
-	newF.node = newNode;
-
-	pthread_mutex_lock(&f.mutex);
-	f.active = false;
-	if (f.threadCount == 0)
+	try
 	{
-		pthread_mutex_unlock(&f.mutex);
-		remove(f.path.c_str());
-		fileList.deleteLocalFile(f); //delete from file list
+		LocalFile &f = fileList.findLocalFile(file);
+		File newF = f;
+		newF.node = newNode;
+
+		pthread_mutex_lock(&f.mutex);
+		f.active = false;
+		if (f.threadCount == 0)
+		{
+			pthread_mutex_unlock(&f.mutex);
+			remove(f.path.c_str());
+			fileList.deleteLocalFile(f); //delete from file list
+		}
+		else pthread_mutex_unlock(&f.mutex);
+		fileList.addRemoteFile(newF);
+		pthread_rwlock_unlock(&fileListLock);
+		return 0;
 	}
-	else pthread_mutex_unlock(&f.mutex);
-	fileList.addRemoteFile(newF);
-	pthread_rwlock_unlock(&fileListLock);
-	return 0;
+	catch (std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
+		return 1;
+	}
 }
 
 bool FileManager::isActive(Descriptor localFile)
 {
 	bool a;
 	pthread_rwlock_rdlock(&fileListLock);
-	LocalFile &f = fileList.findLocalFile(localFile);
-	pthread_mutex_lock(&f.mutex);
-	a = f.active;
-	pthread_mutex_unlock(&f.mutex);
-	pthread_rwlock_unlock(&fileListLock);
-	return a;
+	try
+	{
+		LocalFile &f = fileList.findLocalFile(localFile);
+		pthread_mutex_lock(&f.mutex);
+		a = f.active;
+		pthread_mutex_unlock(&f.mutex);
+		pthread_rwlock_unlock(&fileListLock);
+		return a;
+	}
+	catch(std::out_of_range& e) {
+		return false;
+	}
 }

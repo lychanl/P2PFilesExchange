@@ -17,6 +17,9 @@ FileList::FileList(std::string fileDir) : fileDir(fileDir)
 int FileList::deleteLocalFile(Descriptor desc)
 {
 	auto it = localFiles.find(desc);
+	if(it == localFiles.end()) {
+		throw(std::out_of_range("file with given descriptor not found"));
+	}
 	localFiles.erase(it);
 	return 0;
 }
@@ -30,7 +33,11 @@ File &FileList::findFile(files::Descriptor file)
 
 LocalFile &FileList::findLocalFile(files::Descriptor file)
 {
-	return localFiles.find(file)->second;
+	auto it = localFiles.find(file);
+	if(it == localFiles.end()) {
+		throw std::out_of_range("file with given descriptor not found");
+	}
+	return it->second;
 }
 
 const File &FileList::findFile(files::Descriptor file) const
@@ -42,7 +49,11 @@ const File &FileList::findFile(files::Descriptor file) const
 
 const LocalFile &FileList::findLocalFile(files::Descriptor file) const
 {
-	return localFiles.find(file)->second;
+	auto it = localFiles.find(file);
+	if(it == localFiles.end()) {
+		throw std::out_of_range("file with given descriptor not found");
+	}
+	return it->second;
 }
 
 int FileList::addLocalFile(files::LocalFile &file)
@@ -60,6 +71,9 @@ int FileList::addRemoteFile(files::File &file)
 int FileList::deleteRemoteFile(Descriptor desc)
 {
 	auto it = remoteFiles.find(desc);
+	if(it == remoteFiles.end()) {
+		throw(std::out_of_range("file with given descriptor not found"));
+	}
 	remoteFiles.erase(it);
 	return 0;
 }

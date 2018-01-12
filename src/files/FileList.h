@@ -39,6 +39,7 @@ namespace files
 	private:
 		std::unordered_map<Descriptor, File, DescriptorHasher> remoteFiles;
 		std::unordered_map<Descriptor, LocalFile, DescriptorHasher> localFiles;
+		LocalFile emptyFile;
 		std::string fileDir;
 	};
 }
