@@ -36,7 +36,7 @@ namespace ui
             Parser();
 
             // -connect mask address
-            int connect(long int mask, const std::string& address);
+            int connect(const std::string& address);
             // -disconnect
             int disconnect();
             // -upload filename

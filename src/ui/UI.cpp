@@ -1,5 +1,6 @@
 #include <exception.h>
 #include <log/Logger.h>
+#include <fcntl.h>
 #include "UI.h"
 
 using namespace ui;
@@ -13,76 +14,69 @@ int UI::parseUserInput(const std::string &inputString)
         return parser.disconnect();
     }
 
-    if (inputString.substr(0, 8) == "-connect")
+    if (inputString.substr(0, 7) == "connect")
     {
         char * substrEnd;
-        long int mask;
 
-        if ((inputString.length() < 15))
+        if ((inputString.length() <= 12))
         {
-            cout << "Invalid command" << endl;
+            cout << "Invalid adress" << endl;
             return -1;
         }
 
-        if ((mask = strtol(inputString.substr(9, 2).c_str(), &substrEnd, 10)) == 0)
-        {
-            cout << "Invalid mask " + inputString.substr(9, 2) << endl;
-            return -2;
-        }
-
-        return parser.connect(mask, inputString.substr(13, inputString.length() - 13));
+        return parser.connect(inputString.substr(12, inputString.length() - 12));
     }
-    else if (inputString.substr(0, 11) == "-disconnect")
+    else if (inputString == "disconnect")
     {
        return parser.disconnect();
     }
-    else if(inputString.substr(0, 7) == "-upload")
+    else if(inputString.substr(0, 6) == "upload")
     {
         string filename;
 
-        if (inputString.length() < 9)
+        if (inputString.length() <= 7)
         {
-            cout << "Invalid command" << endl;
+            cout << "Invalid filename" << endl;
             return -3;
         }
 
-        filename = inputString.substr(8, inputString.length() - 8);
+        filename = inputString.substr(7, inputString.length() - 7);
 
         return parser.uploadFile(filename);
     }
-    else if(inputString.substr(0, 7) == "-delete")
+    else if(inputString.substr(0, 6) == "delete")
     {
         string filename;
 
-        if (inputString.length() < 9)
+        if (inputString.length() <= 7)
         {
-            cout << "Invalid command" << endl;
+            cout << "Invalid filename" << endl;
             return -4;
         }
 
-        filename = inputString.substr(8, inputString.length() - 8);
+        filename = inputString.substr(7, inputString.length() - 7);
 
         return parser.deleteFile(filename);
     }
-    else if(inputString.substr(0, 9) == "-download")
+    else if(inputString.substr(0, 8) == "download")
     {
         string filename;
 
-        if (inputString.length() < 11)
+        if (inputString.length() <= 9)
         {
-            cout << "Invalid command" << endl;
+            cout << "Invalid filename" << endl;
             return -5;
         }
 
-        filename = inputString.substr(10, inputString.length() - 10);
+        filename = inputString.substr(9, inputString.length() - 9);
 
         return parser.downloadFile(filename);
     }
-    else if(inputString == "-la")
+    else if(inputString == "la")
     {
         parser.listAll();
     }
-    else if(inputString == "-l")
+    else if(inputString == "l")
     {
         parser.listLocal();
     }
@@ -90,13 +84,13 @@ int UI::parseUserInput(const std::string &inputString)
     {
         cout << "Invalid command" << endl;
         cout << "Available commands:" << endl;
-        cout << "-connect <mask> <address>" << endl;
-        cout << "-disconnect" << endl;
-        cout << "-upload <filename>" << endl;
-        cout << "-delete <filename>" << endl;
-        cout << "-download <filename>" << endl;
-        cout << "-la" << endl;
-        cout << "-l" << endl;
+        cout << "connect <address>" << endl;
+        cout << "disconnect" << endl;
+        cout << "upload <filename>" << endl;
+        cout << "delete <filename>" << endl;
+        cout << "download <filename>" << endl;
+        cout << "la" << endl;
+        cout << "l" << endl;
     }
     return 0;
 }
@@ -126,7 +120,7 @@ int UI::start()
     } while(parseUserInput(userInput) != DISCONNECT_RETURN_VALUE);
 }
 
-int UI::Parser::connect(long int mask, const std::string &address)
+int UI::Parser::connect(const std::string &address)
 {
     conn::IPv4Address::setLocalAddress(address);
     proto::Protocols::getInstance().connect();
@@ -148,8 +142,10 @@ int UI::Parser::uploadFile(string file)
 
 int UI::Parser::deleteFile(string file)
 {
-    for(auto a: fileManager->listAllFiles()) {
-        if (a.name == file){
+    for(auto a: fileManager->listAllFiles())
+    {
+        if (a.name == file)
+        {
             proto::Protocols::getInstance().deactivateFile(a);
             break;
         }
@@ -159,9 +155,12 @@ int UI::Parser::deleteFile(string file)
 
 int UI::Parser::downloadFile(string file)
 {
-    for(auto a: fileManager->listAllFiles()) {
-        if (a.name == file){
-            //proto::Protocols::getInstance().getFile(a, );
+    for(auto a: fileManager->listAllFiles())
+    {
+        if (a.name == file)
+        {
+            int fd = open(file.c_str(), O_RDWR);
+            proto::Protocols::getInstance().getFile(a, fd);
             break;
         }
     }
@@ -170,23 +169,27 @@ int UI::Parser::downloadFile(string file)
 
 void UI::Parser::listAll()
 {
-    for(auto a: fileManager->listAllFiles()){
+    for(auto a: fileManager->listAllFiles())
+    {
         std::cout << a.owner << " " << a.name << " " << a.date << std::endl;
     }
 }
 
 void UI::Parser::listLocal()
 {
-    for(auto a: fileManager->listLocalFiles()){
+    for(auto a: fileManager->listLocalFiles())
+    {
         std::cout << a.owner << " " << a.name << " " << a.date << std::endl;
     }
 }
 
-UI::Parser::Parser() {
+UI::Parser::Parser()
+{
     fileManager = new files::FileManager(conn::IPv4Address::getLocalAddress(0), "/localNode/files");
 }
 
-UI::Parser::~Parser() {
+UI::Parser::~Parser()
+{
     delete fileManager;
 }
 
@@ -207,5 +210,6 @@ void UI::initSignals()
     sigaction(SIGINT, &sigact, (struct sigaction *) nullptr);
 }
 
-UI::~UI() {
+UI::~UI()
+{
 }
