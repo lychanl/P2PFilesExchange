@@ -9,12 +9,12 @@
 
 using namespace files;
 
-FileList::FileList(std::string fileDir) : fileDir(fileDir)
+FileList::FileList(const std::string& fileDir) : fileDir(fileDir)
 {
 
 }
 
-int FileList::deleteLocalFile(Descriptor desc)
+int FileList::deleteLocalFile(const Descriptor& desc)
 {
 	auto it = localFiles.find(desc);
 	if(it == localFiles.end()) {
@@ -24,14 +24,14 @@ int FileList::deleteLocalFile(Descriptor desc)
 	return 0;
 }
 
-File &FileList::findFile(files::Descriptor file)
+File &FileList::findFile(const Descriptor& file)
 {
 	auto it = remoteFiles.find(file);
 	if (it != remoteFiles.end()) return it->second;
 	return findLocalFile(file);
 }
 
-LocalFile &FileList::findLocalFile(files::Descriptor file)
+LocalFile &FileList::findLocalFile(const Descriptor& file)
 {
 	auto it = localFiles.find(file);
 	if(it == localFiles.end()) {
@@ -40,14 +40,14 @@ LocalFile &FileList::findLocalFile(files::Descriptor file)
 	return it->second;
 }
 
-const File &FileList::findFile(files::Descriptor file) const
+const File &FileList::findFile(const Descriptor& file) const
 {
 	auto it = remoteFiles.find(file);
 	if (it != remoteFiles.end()) return it->second;
 	return findLocalFile(file);
 }
 
-const LocalFile &FileList::findLocalFile(files::Descriptor file) const
+const LocalFile &FileList::findLocalFile(const Descriptor& file) const
 {
 	auto it = localFiles.find(file);
 	if(it == localFiles.end()) {
@@ -56,19 +56,19 @@ const LocalFile &FileList::findLocalFile(files::Descriptor file) const
 	return it->second;
 }
 
-int FileList::addLocalFile(files::LocalFile &file)
+int FileList::addLocalFile(LocalFile &file)
 {
 	localFiles[file] = file;
 	return 0;
 }
 
-int FileList::addRemoteFile(files::File &file)
+int FileList::addRemoteFile(File &file)
 {
 	remoteFiles[file] = file;
 	return 0;
 }
 
-int FileList::deleteRemoteFile(Descriptor desc)
+int FileList::deleteRemoteFile(const Descriptor& desc)
 {
 	auto it = remoteFiles.find(desc);
 	if(it == remoteFiles.end()) {
@@ -78,7 +78,7 @@ int FileList::deleteRemoteFile(Descriptor desc)
 	return 0;
 }
 
-std::string FileList::copyToFileDir(std::string in)
+std::string FileList::copyToFileDir(const std::string& in)
 {
 	int input, output;
 	const char *baseName = basename(in.c_str());

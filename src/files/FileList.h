@@ -10,17 +10,17 @@ namespace files
 	class FileList
 	{
 	public:
-		explicit FileList(std::string fileDir);
+		explicit FileList(const std::string& fileDir);
 
-		std::string copyToFileDir(std::string in);
+		std::string copyToFileDir(const std::string& in);
 
 		int addLocalFile(LocalFile &file);
 
-		int deleteLocalFile(Descriptor desc);
+		int deleteLocalFile(const Descriptor& desc);
 
 		int addRemoteFile(File &file);
 
-		int deleteRemoteFile(Descriptor desc);
+		int deleteRemoteFile(const Descriptor& desc);
 
 		int deleteFromNode(unsigned long int nodeAddress);
 
@@ -28,13 +28,13 @@ namespace files
 
 		const std::vector<Descriptor> listAllLocal() const;
 
-		File &findFile(Descriptor file);
+		File &findFile(const Descriptor& file);
 
-		LocalFile &findLocalFile(Descriptor file);
+		LocalFile &findLocalFile(const Descriptor& file);
 
-		const File &findFile(Descriptor file) const;
+		const File &findFile(const Descriptor& file) const;
 
-		const LocalFile &findLocalFile(Descriptor file) const;
+		const LocalFile &findLocalFile(const Descriptor& file) const;
 
 	private:
 		std::unordered_map<Descriptor, File, DescriptorHasher> remoteFiles;

@@ -4,7 +4,7 @@
 
 using namespace files;
 
-files::FileManager::FileManager(conn::IPv4Address localNode, std::string fileDir) : localNode(localNode),
+files::FileManager::FileManager(conn::IPv4Address localNode, const std::string& fileDir) : localNode(localNode),
 																					fileList(fileDir)
 {
 	pthread_rwlock_init(&fileListLock, nullptr);
@@ -33,7 +33,7 @@ int FileManager::addDiskFile(const std::string &diskPath)
 	return 0;
 }
 
-int FileManager::addDiskFile(Descriptor file, const std::string &diskPath)
+int FileManager::addDiskFile(const Descriptor& file, const std::string &diskPath)
 {
 	LocalFile f(localNode);
 	f = file;
@@ -47,7 +47,7 @@ int FileManager::addDiskFile(Descriptor file, const std::string &diskPath)
 	return 0;
 }
 
-const conn::IPv4Address FileManager::getNode(Descriptor file)
+const conn::IPv4Address FileManager::getNode(const Descriptor& file)
 {
 	pthread_rwlock_rdlock(&fileListLock);
 	try
@@ -80,12 +80,12 @@ const std::vector<Descriptor> FileManager::listLocalFiles()
 	return f;
 }
 
-int FileManager::addRemoteFile(Descriptor descriptor, conn::IPv4Address node, unsigned long long int date)
+int FileManager::addRemoteFile(const Descriptor& descriptor, const conn::IPv4Address& node, unsigned long long int date)
 {
 	return addRemoteFiles({descriptor}, node, date);
 }
 
-int FileManager::addRemoteFiles(std::vector<Descriptor> descriptors, conn::IPv4Address node, unsigned long long int date)
+int FileManager::addRemoteFiles(const std::vector<Descriptor>& descriptors, const conn::IPv4Address& node, unsigned long long int date)
 {
 	pthread_rwlock_wrlock(&fileListLock);
 	auto it = listDates.find(node.getAddress());
@@ -113,7 +113,7 @@ int FileManager::addRemoteFiles(std::vector<Descriptor> descriptors, conn::IPv4A
 	return 0;
 }
 
-int FileManager::removeRemoteFile(Descriptor descriptor)
+int FileManager::removeRemoteFile(const Descriptor& descriptor)
 {
 	pthread_rwlock_wrlock(&fileListLock);
 	try
@@ -128,7 +128,7 @@ int FileManager::removeRemoteFile(Descriptor descriptor)
 }
 
 // for deadbody or something
-int FileManager::removeRemoteFilesFromNode(conn::IPv4Address node)
+int FileManager::removeRemoteFilesFromNode(const conn::IPv4Address& node)
 {
 	pthread_rwlock_wrlock(&fileListLock);
 	fileList.deleteFromNode(node.getAddress());
@@ -137,7 +137,7 @@ int FileManager::removeRemoteFilesFromNode(conn::IPv4Address node)
 }
 
 
-int FileManager::deactivateLocalFile(Descriptor file)
+int FileManager::deactivateLocalFile(const Descriptor& file)
 {
 	pthread_rwlock_wrlock(&fileListLock);
 	try
@@ -166,7 +166,7 @@ int FileManager::deactivateLocalFile(Descriptor file)
 }
 
 // returns fd open for reading
-int FileManager::openLocalFile(Descriptor file)
+int FileManager::openLocalFile(const Descriptor& file)
 {
 	int fd;
 	pthread_rwlock_rdlock(&fileListLock);
@@ -187,7 +187,7 @@ int FileManager::openLocalFile(Descriptor file)
 }
 
 // close the fd yourself
-int FileManager::closeLocalFile(Descriptor file)
+int FileManager::closeLocalFile(const Descriptor& file)
 {
 	pthread_rwlock_wrlock(&fileListLock); // wr because we might need to delete it
 	try
@@ -215,7 +215,7 @@ int FileManager::closeLocalFile(Descriptor file)
 	}
 }
 
-int FileManager::makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode)
+int FileManager::makeLocalFileRemote(const Descriptor& file, const conn::IPv4Address& newNode)
 {
 	pthread_rwlock_wrlock(&fileListLock);
 	try
@@ -243,7 +243,7 @@ int FileManager::makeLocalFileRemote(Descriptor file, conn::IPv4Address newNode)
 	}
 }
 
-bool FileManager::isActive(Descriptor localFile)
+bool FileManager::isActive(const Descriptor& localFile)
 {
 	bool a;
 	pthread_rwlock_rdlock(&fileListLock);
@@ -257,6 +257,7 @@ bool FileManager::isActive(Descriptor localFile)
 		return a;
 	}
 	catch(std::out_of_range& e) {
+		pthread_rwlock_unlock(&fileListLock);
 		return false;
 	}
 }
