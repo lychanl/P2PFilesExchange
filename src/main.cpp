@@ -7,6 +7,7 @@ using namespace std;
 
 int main()
 {
+	return 0;
 	conn::TCPConnection::enableConnections();
     conn::IPv4Address local = conn::IPv4Address::getLocalAddress(0);
     conn::UDPBroadcaster udpBroadcaster(conn::IPv4Address::getBroadcastAddress(local, 24, 8080));

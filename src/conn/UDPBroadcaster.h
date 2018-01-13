@@ -5,6 +5,7 @@
 #include "IPv4Address.h"
 
 #include <pthread.h>
+#include <proto/Package.h>
 
 namespace conn
 {
@@ -17,6 +18,7 @@ namespace conn
 		int open();
 		void close();
 
+		int send(proto::Package* package);
 		int send(const void* buffer, int size);
 
 	private:

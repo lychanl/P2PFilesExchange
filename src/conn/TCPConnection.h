@@ -6,6 +6,7 @@
 
 #include <sys/socket.h>
 #include <exception.h>
+#include <proto/Package.h>
 
 namespace conn
 {
@@ -45,11 +46,14 @@ namespace conn
 		// 0 if ok
 		// -1 if error
 		int send(const void* buffer, size_t n);
+		int send(proto::Package* package);
 		//Reads exactly n bytes from remote
 		//Returns:
 		// 0 if ok
 		// -1 if error
 		int recv(void* buffer, size_t n);
+		int recv(proto::Package* package);
+		int recvNoId(proto::Package* package);
 
 		Status getStatus() const;
 		int getError() const;

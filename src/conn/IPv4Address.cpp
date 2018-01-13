@@ -6,6 +6,8 @@
 using namespace conn;
 using namespace std;
 
+constexpr unsigned short int APPLICATION_PORT = 6969;
+
 IPv4Address IPv4Address::localAddress(INADDR_ANY, 0);
 
 IPv4Address::IPv4Address(unsigned long int address) : IPv4Address(address, 0)
@@ -90,4 +92,12 @@ sockaddr_in IPv4Address::getLocalAddress(int port)
 void IPv4Address::setLocalAddress(const IPv4Address &address)
 {
 	localAddress = IPv4Address(address.address, 0);
+}
+
+string IPv4Address::operator std::string() const
+{
+	return to_string(address >> 24) + "." +
+			to_string(address >> 16 & 255) + "." +
+			to_string(address >> 8 & 255) + "." +
+			to_string(address & 255) + ":" + to_string(port);
 }

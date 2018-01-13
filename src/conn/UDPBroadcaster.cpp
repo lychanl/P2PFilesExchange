@@ -1,6 +1,7 @@
 
 #include "UDPBroadcaster.h"
 #include <unistd.h>
+#include <log/Logger.h>
 
 using namespace conn;
 
@@ -29,6 +30,7 @@ int UDPBroadcaster::open()
 
 		if (socket < 0)
 		{
+			Logger::getInstance().logError("UDPBroadcaster: Error while creating socket. Errno: " + errno);
 			pthread_mutex_unlock(&this->mutex);
 			return -1;
 		}
@@ -66,9 +68,25 @@ int UDPBroadcaster::send(const void *buffer, int size)
 	{
 		if (sendto(this->socket, buffer, size, 0, reinterpret_cast<sockaddr*>(&this->addr), sizeof(this->addr)) == size)
 			ret = 0;
+		else
+			Logger::getInstance().logError("UDPBroadcaster: Error while sending. Errno: " + errno);
 	}
 
 	pthread_mutex_unlock(&this->mutex);
+
+	return ret;
+}
+
+int UDPBroadcaster::send(proto::Package *package)
+{
+	int size = package->getSerializedSize();
+	char* buffer = new char[size];
+
+	package->serializeTo(buffer);
+
+	int ret = send(buffer, size);
+
+	delete[] buffer;
 
 	return ret;
 }

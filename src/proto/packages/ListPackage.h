@@ -12,6 +12,7 @@ namespace proto
 	{
 	public:
 		constexpr static char ID[] = "LIST";
+		constexpr static int MAX_FILES_N = 23;
 
 		ListPackage();
 

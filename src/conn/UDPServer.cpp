@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <csignal>
 #include <sys/signalfd.h>
+#include <log/Logger.h>
 
 using namespace conn;
 
@@ -27,10 +28,14 @@ int UDPServer::GlobalUDPServer::initSocket()
 	int ret = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	if (ret < 0)
+	{
+		Logger::getInstance().logError("UDPServer: Error while creating socket. Errno: " + errno);
 		return -1;
+	}
 
 	if (::bind(ret, reinterpret_cast<sockaddr*>(&this->address), sizeof (this->address)) < 0)
 	{
+		Logger::getInstance().logError("UDPServer: Error while binding socket. Errno: " + errno);
 		::close(ret);
 		return -1;
 	}
@@ -56,7 +61,7 @@ int UDPServer::GlobalUDPServer::_run(int socketToRead)
 
 	if (read < 0)
 	{
-		//error handling (todo)
+		Logger::getInstance().logError("UDPServer: Error while receiving. Errno: " + errno);
 	}
 
 	if (read > 0)

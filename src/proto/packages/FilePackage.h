@@ -12,6 +12,7 @@ namespace proto
 	class FilePackage : public Package
 	{
 	public:
+		constexpr static int MAX_DATA_SIZE = 32768;
 		constexpr static char ID[] = "FILE";
 
 		FilePackage();

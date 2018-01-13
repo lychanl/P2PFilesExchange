@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <pthread.h>
+#include <log/Logger.h>
 
 int connections = 0;
 pthread_mutex_t connectionsMutex;
@@ -22,6 +23,7 @@ TCPConnection::TCPConnection(const IPv4Address& address) : remoteAddr(address)
 {
 	if (createSocket() != 0)
 	{
+		Logger::getInstance().logError("TCPConnection: Error while creating or binding socket. Errno: " + error);
 		return;
 	}
 
@@ -62,6 +64,7 @@ int TCPConnection::connect()
 
 	if (::connect(socket, reinterpret_cast<const sockaddr*>(&remoteAddr.getSockaddr()), sizeof(sockaddr_in)) != 0)
 	{
+		Logger::getInstance().logError("TCPConnection: Error while connecting. Errno: " + errno);
 		pthread_mutex_unlock(&connectionsMutex);
 
 		error = errno;
@@ -90,7 +93,7 @@ int TCPConnection::reconnect()
 	if (connect() != 0)
 		return -1;
 
-	status == STATUS_OPEN;
+	status = STATUS_OPEN;
 
 	return 0;
 }
@@ -145,6 +148,9 @@ int TCPConnection::send(const void *buffer, size_t n)
 		{
 			error = errno;
 			status = STATUS_ERR;
+
+			Logger::getInstance().logError("TCPConnection: Error while sending. Errno: " + error);
+
 			return -1;
 		}
 
@@ -154,6 +160,20 @@ int TCPConnection::send(const void *buffer, size_t n)
 
 	status = STATUS_OPEN;
 	return 0;
+}
+
+int TCPConnection::send(proto::Package* package)
+{
+	int size = package->getSerializedSize();
+	char* buffer = new char[size];
+
+	package->serializeTo(buffer);
+
+	int ret = send(buffer, size);
+
+	delete[] buffer;
+
+	return ret;
 }
 
 int TCPConnection::recv(void *buffer, size_t n)
@@ -172,12 +192,78 @@ int TCPConnection::recv(void *buffer, size_t n)
 		{
 			error = errno;
 			status = STATUS_ERR;
+
+			Logger::getInstance().logError("TCPConnection: Error while receiving. Errno: " + error);
+
 			return -1;
 		}
 
 		left -= received;
 		offset += received;
 	}
+}
+
+int TCPConnection::recv(proto::Package* package)
+{
+	char* buffer = new char[package->getHeaderSize()];
+
+	if (recv(buffer, package->getHeaderSize()))
+	{
+		delete[] buffer;
+		return -1;
+	}
+
+	int dataSize = package->parseHeader(buffer);
+	delete[] buffer;
+
+	if (dataSize == 0)
+		return 0;
+
+	buffer = new char[dataSize];
+
+	if (recv(buffer, dataSize))
+	{
+		delete[] buffer;
+		return -1;
+	}
+
+	package->parseData(buffer);
+	delete[] buffer;
+
+	return 0;
+}
+
+int TCPConnection::recvNoId(proto::Package* package)
+{
+	if (package->getHeaderSize() == 4)
+		return 0;
+
+	char* buffer = new char[package->getHeaderSize() - 4];
+
+	if (recv(buffer, package->getHeaderSize()) - 4)
+	{
+		delete[] buffer;
+		return -1;
+	}
+
+	int dataSize = package->parseHeader(buffer - 4);
+	delete[] buffer;
+
+	if (dataSize == 0)
+		return 0;
+
+	buffer = new char[dataSize];
+
+	if (recv(buffer, dataSize))
+	{
+		delete[] buffer;
+		return -1;
+	}
+
+	package->parseData(buffer);
+	delete[] buffer;
+
+	return 0;
 }
 
 void TCPConnection::enableConnections()

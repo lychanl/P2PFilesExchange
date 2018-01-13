@@ -2,7 +2,6 @@
 #ifndef P2PFILESEXCHANGE_PACKAGE_H
 #define P2PFILESEXCHANGE_PACKAGE_H
 
-#include "conn/TCPConnection.h"
 #include <cstdint>
 
 namespace proto
