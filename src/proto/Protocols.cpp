@@ -160,6 +160,9 @@ Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 
 void* Protocols::_uploadFile(void* arg)
 {
+	if (getInstance().nodes.size() == 0)
+		return nullptr;
+
 	files::Descriptor* file = static_cast<files::Descriptor*>(arg);
 
 	bool wasRedistibutionAtStart = getInstance().isRedistributing;

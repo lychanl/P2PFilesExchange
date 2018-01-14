@@ -67,6 +67,12 @@ int FileManager::addDiskFile(const Descriptor &file, const std::string &diskPath
 	LocalFile f(localNode);
 	f = file;
 	std::string path = fileList.copyToFileDir(diskPath);
+	if (path.size() == 0)
+	{
+		Logger::getInstance().logError(
+				"FileManager: Could not add file from path: " + diskPath + ", errno: " + strerror(errno));
+		return -1;
+	}
 	f.node = localNode;
 
 	// add file to list
@@ -108,6 +114,15 @@ const std::vector<Descriptor> FileManager::listLocalFiles()
 	std::vector<Descriptor> f;
 	pthread_rwlock_rdlock(&fileListLock);
 	f = fileList.listAllLocal();
+	pthread_rwlock_unlock(&fileListLock);
+	return f;
+}
+
+const std::vector<Descriptor> FileManager::listRemoteFiles()
+{
+	std::vector<Descriptor> f;
+	pthread_rwlock_rdlock(&fileListLock);
+	f = fileList.listAllRemote();
 	pthread_rwlock_unlock(&fileListLock);
 	return f;
 }
