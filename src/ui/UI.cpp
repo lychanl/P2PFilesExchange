@@ -139,7 +139,13 @@ int UI::Parser::disconnect()
 
 int UI::Parser::uploadFile(string file)
 {
-    proto::Protocols::getInstance().uploadFile(fileManager->addDiskFile(file));
+    files::Descriptor descriptor = fileManager->addDiskFile(file);
+    if (descriptor.name[0] == '\0')
+    {
+        Logger::getInstance().getInstance().logMessage("file not found");
+    } else
+        proto::Protocols::getInstance().uploadFile(descriptor);
+
     return 0;
 }
 

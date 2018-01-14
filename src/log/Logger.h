@@ -31,6 +31,11 @@ public:
 
     void logDebug(std::string debug);
 
+    void setShouldShowDebug(bool shouldShowDebug);
+
+private:
+    bool shouldShowDebug = true;
+
 };
 
 #endif //P2PFILESEXCHANGE_LOGGER_H

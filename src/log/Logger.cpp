@@ -21,10 +21,17 @@ void Logger::logError(std::string error)
 }
 
 void Logger::logDebug(std::string debug) {
+    if (!shouldShowDebug)
+        return;
+
     std::lock_guard<std::mutex> guard(loggerMutex);
 
     auto time = std::chrono::system_clock::now();
     std::time_t timeT = std::chrono::system_clock::to_time_t(time);
 
     std::cout << "\033[1;34m DEBUG: " << std::ctime(&timeT) << " " <<debug << "\033[0m\n" << std::endl;
+}
+
+void Logger::setShouldShowDebug(bool shouldShowDebug) {
+    Logger::shouldShowDebug = shouldShowDebug;
 }
