@@ -56,7 +56,7 @@ namespace files
 	struct LocalFile : public File
 	{
 		explicit LocalFile(const conn::IPv4Address& node);
-		LocalFile() = default;
+		LocalFile();
 		~LocalFile();
 
 		LocalFile &operator=(const Descriptor &desc);

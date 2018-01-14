@@ -48,3 +48,8 @@ LocalFile::~LocalFile()
 {
 	pthread_mutex_destroy(&mutex);
 }
+
+LocalFile::LocalFile()
+{
+	pthread_mutex_init(&mutex, nullptr);
+}
