@@ -119,6 +119,16 @@ const std::vector<Descriptor> FileList::listAll() const
 	return f;
 }
 
+
+const std::vector<Descriptor> FileList::listAllRemote() const
+{
+	std::vector<Descriptor> f;
+	for (auto it : remoteFiles)
+	{
+		f.push_back(it.first);
+	}
+	return f;
+}
 const std::vector<Descriptor> FileList::listAllLocal() const
 {
 	std::vector<Descriptor> f;

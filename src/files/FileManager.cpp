@@ -118,6 +118,15 @@ const std::vector<Descriptor> FileManager::listLocalFiles()
 	return f;
 }
 
+const std::vector<Descriptor> FileManager::listRemoteFiles()
+{
+	std::vector<Descriptor> f;
+	pthread_rwlock_rdlock(&fileListLock);
+	f = fileList.listAllRemote();
+	pthread_rwlock_unlock(&fileListLock);
+	return f;
+}
+
 int FileManager::addRemoteFile(const Descriptor &descriptor, const conn::IPv4Address &node, unsigned long long int date)
 {
 	return addRemoteFiles({descriptor}, node, date);

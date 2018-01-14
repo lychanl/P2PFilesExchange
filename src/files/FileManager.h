@@ -42,6 +42,8 @@ namespace files
 
 		const std::vector<Descriptor> listLocalFiles();
 
+		const std::vector<Descriptor> listRemoteFiles();
+
 	private:
 
 		std::unordered_map<unsigned long int, unsigned long long int> listDates; // keeps <node, date> pairs to tell

@@ -28,6 +28,8 @@ namespace files
 
 		const std::vector<Descriptor> listAllLocal() const;
 
+		const std::vector<Descriptor> listAllRemote() const;
+
 		File &findFile(const Descriptor& file);
 
 		LocalFile &findLocalFile(const Descriptor& file);
