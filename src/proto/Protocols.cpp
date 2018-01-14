@@ -114,12 +114,12 @@ Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 
 	for (int i = 0; i < MAX_RERUNS; i++)
 	{
+		conn::TCPConnection connection(addr);
+		if (connection.send(&getPackage) != 0)
+			break;
+
 		do
 		{
-			conn::TCPConnection connection(addr);
-			if (connection.send(&getPackage) != 0)
-				break;
-
 			char ID[4];
 			if (connection.recv(ID, 4))
 				break;
@@ -139,13 +139,14 @@ Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 			}
 
 			FilePackage filePackage;
-			if (!connection.recvNoId(&filePackage))
+			if (connection.recvNoId(&filePackage) != 0)
 				break;
 
+			int res;
 			if (filePackage.getSize() != 0)
-				write(fd, filePackage.getDataPtr(), filePackage.getSize());
+				res = write(fd, filePackage.getDataPtr(), filePackage.getSize());
 
-			if (filePackage.getLeftSize() - filePackage.getSize())
+			if (filePackage.getLeftSize() == filePackage.getSize())
 				finished = true;
 		} while (!finished);
 
@@ -180,7 +181,8 @@ void* Protocols::_uploadFile(void* arg)
 
 		FILE *stream = fdopen(fd, "rb");
 
-		int leftSize = fseek(stream, 0, SEEK_END);
+		fseek(stream, 0, SEEK_END);
+		int leftSize = ftell(stream);
 		rewind(stream);
 
 		conn::TCPConnection connection(conn::IPv4Address(targetAddress.getAddress(), conn::IPv4Address::APPLICATION_PORT));
@@ -250,7 +252,7 @@ void Protocols::uploadFile(const files::Descriptor &file)
 
 Protocols::Result Protocols::deactivateFile(const files::Descriptor &file)
 {
-	conn::IPv4Address node = conn::IPv4Address(getNode(file).getAddress(), conn::IPv4Address::APPLICATION_PORT);
+	conn::IPv4Address node = conn::IPv4Address(fileManager->getNode(file).getAddress(), conn::IPv4Address::APPLICATION_PORT);
 
 	for (int i = 0; i < MAX_RERUNS; i++)
 	{
@@ -389,8 +391,8 @@ void Protocols::sendFile(files::Descriptor& descriptor, conn::TCPConnection& con
 	}
 
 	FILE* fstream = fdopen(fd, "rb");
-
-	int leftSize = fseek(fstream, 0, SEEK_END);
+	fseek(fstream, 0, SEEK_END);
+	int leftSize = ftell(fstream);
 	rewind(fstream);
 
 	char* buffer = new char[FilePackage::MAX_DATA_SIZE];

@@ -64,10 +64,10 @@ int TCPConnection::connect()
 
 	if (::connect(socket, reinterpret_cast<const sockaddr*>(&remoteAddr.getSockaddr()), sizeof(sockaddr_in)) != 0)
 	{
-		Logger::getInstance().logError("TCPConnection: Error while connecting. Errno: " + errno);
+		error = errno;
+		Logger::getInstance().logError("TCPConnection: Error while connecting. Errno: " + std::to_string(errno));
 		pthread_mutex_unlock(&connectionsMutex);
 
-		error = errno;
 		status = STATUS_FATAL;
 		return -1;
 	}
@@ -201,6 +201,8 @@ int TCPConnection::recv(void *buffer, size_t n)
 		left -= received;
 		offset += received;
 	}
+
+	return 0;
 }
 
 int TCPConnection::recv(proto::Package* package)
@@ -240,7 +242,7 @@ int TCPConnection::recvNoId(proto::Package* package)
 
 	char* buffer = new char[package->getHeaderSize() - 4];
 
-	if (recv(buffer, package->getHeaderSize()) - 4)
+	if (recv(buffer, package->getHeaderSize() - 4))
 	{
 		delete[] buffer;
 		return -1;

@@ -51,10 +51,10 @@ int Package::getInt(int offset)
 
 unsigned int Package::getUInt(int offset)
 {
-	return ((unsigned)getChar(offset) << 24) +
-			((unsigned)getChar(offset + 1) << 16) +
-			((unsigned)getChar(offset + 2) << 8) +
-			(unsigned)getChar(offset + 3);
+	return ((unsigned)(unsigned char)getChar(offset) << 24) +
+			((unsigned)(unsigned char)getChar(offset + 1) << 16) +
+			((unsigned)(unsigned char)getChar(offset + 2) << 8) +
+			(unsigned)(unsigned char)getChar(offset + 3);
 }
 
 char Package::getChar(int offset)
@@ -77,10 +77,10 @@ void Package::put(int value, int offset)
 
 void Package::put(unsigned int value, int offset)
 {
-	put((char)(value >> 24), offset);
-	put((char)((value >> 16) & 255), offset + 1);
-	put((char)((value >> 8) & 255), offset + 2);
-	put((char)(value & 255), offset + 3);
+	put((char)(unsigned char)(value >> 24), offset);
+	put((char)(unsigned char)((value >> 16) & 255), offset + 1);
+	put((char)(unsigned char)((value >> 8) & 255), offset + 2);
+	put((char)(unsigned char)(value & 255), offset + 3);
 }
 
 void Package::put(char value, int offset)

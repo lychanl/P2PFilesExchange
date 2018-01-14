@@ -31,7 +31,7 @@ void GetPackage::setDescriptor(const files::Descriptor &descriptor)
 int GetPackage::parseHeader()
 {
 	this->descriptor.owner = getUInt(4);
-	this->descriptor.date = (unsigned long long)getUInt(8) << 32 | getUInt(12);
+	this->descriptor.date = ((unsigned long long)getUInt(8) << 32) | getUInt(12);
 	strncpy(this->descriptor.name, (char*)getData(16), 52);
 	return 0;
 }
