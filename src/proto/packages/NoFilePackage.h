@@ -2,6 +2,7 @@
 #ifndef P2PFILESEXCHANGE_NOFILEPACKAGE_H
 #define P2PFILESEXCHANGE_NOFILEPACKAGE_H
 
+#include <conn/IPv4Address.h>
 #include "proto/Package.h"
 
 namespace proto

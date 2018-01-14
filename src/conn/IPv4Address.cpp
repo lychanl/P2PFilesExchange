@@ -94,7 +94,7 @@ void IPv4Address::setLocalAddress(const IPv4Address &address)
 	localAddress = IPv4Address(address.address, 0);
 }
 
-string IPv4Address::operator std::string() const
+IPv4Address::operator std::string() const
 {
 	return to_string(address >> 24) + "." +
 			to_string(address >> 16 & 255) + "." +

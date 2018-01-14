@@ -158,7 +158,7 @@ Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 	return Result ::OK;
 }
 
-static void* Protocols::_uploadFile(void* arg)
+void* Protocols::_uploadFile(void* arg)
 {
 	files::Descriptor* file = static_cast<files::Descriptor*>(arg);
 
@@ -206,7 +206,7 @@ static void* Protocols::_uploadFile(void* arg)
 					if (sizeToSend > 0)
 					{
 						buffer = new char[sizeToSend];
-						fread(stream, 1, sizeToSend, buffer);
+						fread(buffer, 1, sizeToSend, stream);
 					}
 
 					FilePackage filePackage;
@@ -275,7 +275,7 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 					((char *) buffer)[2],
 					((char *) buffer)[3],
 					'\0'
-			}) + " Sender: " + sender);
+			}) + " Sender: " + (std::string)sender);
 
 	if (memcmp(buffer, ConnectPackage::ID, 4) == 0)
 	{
@@ -291,20 +291,20 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 	}
 	else if (memcmp(buffer, HelloPackage::ID, 4) == 0)
 	{
-		pthread_mutex_lock(&greetedNodesMutex);
+		pthread_mutex_lock(&Protocols::getInstance().greetedNodesMutex);
 
 		if (Protocols::getInstance().isRedistributing)
 			Protocols::getInstance().greetedNodes.insert(sender.getAddress());
 
-		pthread_mutex_unlock(&greetedNodesMutex);
+		pthread_mutex_unlock(&Protocols::getInstance().greetedNodesMutex);
 	}
 	else if (memcmp(buffer, KeepAlivePackage::ID, 4) == 0)
 	{
-		pthread_mutex_lock(&nodesMutex);
+		pthread_mutex_lock(&Protocols::getInstance().nodesMutex);
 
 		Protocols::getInstance().nodes[sender.getAddress()] = getTime();
 
-		pthread_mutex_unlock(&nodesMutex);
+		pthread_mutex_unlock(&Protocols::getInstance().nodesMutex);
 	}
 	else if (memcmp(buffer, ListPackage::ID, 4) == 0)
 	{
@@ -323,7 +323,8 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 	if (conn.recv(ID, 4) != 0)
 		return;
 
-	Logger::getInstance().logDebug("Received connection. Package ID: " + std::string({ID[0], ID[1], ID[2], ID[3], '\0'}) + " Sender: " + conn.getRemoteAddress());
+	Logger::getInstance().logDebug("Received connection. Package ID: " + std::string({ID[0], ID[1], ID[2], ID[3], '\0'})
+								   + " Sender: " + (std::string)conn.getRemoteAddress());
 
 	if (memcmp(ID, DeletePackage::ID, 4) == 0)
 	{
