@@ -82,7 +82,11 @@ std::string FileList::copyToFileDir(const std::string& in)
 {
 	int input, output;
 	const char *baseName = basename(in.c_str());
-	std::string out = fileDir + "/" + baseName;
+	std::string out = baseName;
+	if(fileDir.size() > 0)
+	{
+		std::string out = fileDir + "/" + baseName;
+	}
 	if ((input = open(in.c_str(), O_RDONLY)) == -1)
 	{
 		return "";

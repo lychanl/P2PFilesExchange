@@ -18,7 +18,7 @@ namespace files
 		explicit FileManager(conn::IPv4Address localNode, const std::string& fileDir);
 		~FileManager();
 		// everything that returns int except openLocalFile will return 0 on success
-		int addDiskFile(const std::string &diskPath); // creates descriptor
+		Descriptor addDiskFile(const std::string &diskPath); // creates descriptor
 		int addDiskFile(const Descriptor& desc, const std::string &diskPath);
 
 		// if the entry in listDates for this node has an older date, then all descriptors of this node will be erased

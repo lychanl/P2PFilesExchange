@@ -16,7 +16,7 @@ FileManager::~FileManager()
 	pthread_rwlock_destroy(&fileListLock);
 }
 
-int FileManager::addDiskFile(const std::string &diskPath)
+Descriptor FileManager::addDiskFile(const std::string &diskPath)
 {
 	LocalFile f(localNode);
 	std::string path = fileList.copyToFileDir(diskPath);
@@ -30,7 +30,7 @@ int FileManager::addDiskFile(const std::string &diskPath)
 	pthread_rwlock_wrlock(&fileListLock);
 	fileList.addLocalFile(f);
 	pthread_rwlock_unlock(&fileListLock);
-	return 0;
+	return f;
 }
 
 int FileManager::addDiskFile(const Descriptor& file, const std::string &diskPath)
