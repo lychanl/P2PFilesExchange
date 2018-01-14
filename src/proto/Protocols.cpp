@@ -100,7 +100,7 @@ void Protocols::missingNode(const conn::IPv4Address& addr)
 
 	broadcaster->send(&deadbodyPackage);
 
-	redistribute(false);
+	redistribute(true, false);
 }
 
 Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
@@ -579,7 +579,7 @@ void* Protocols::_keepAliveMonitor(void *)
 				pthread_mutex_unlock(&getInstance().nodesMutex);
 				getInstance().broadcaster->send(&deadbodyPackage);
 
-				getInstance().redistribute(false);
+				getInstance().redistribute(true, false);
 				foundBody = true;
 				break;
 			}
