@@ -549,7 +549,7 @@ void* Protocols::_keepAliveMonitor(void *)
 		if (getInstance().isRedistributing)
 			continue;
 
-		int timeToSleep = 10; //sec;
+		int timeToSleep = 300; //sec;
 
 		pthread_mutex_lock(&getInstance().nodesMutex);
 
@@ -564,7 +564,7 @@ void* Protocols::_keepAliveMonitor(void *)
 
 			if (leftTime <= 0)
 			{
-				timeToSleep = 10;
+				timeToSleep = 300;
 				DeadbodyPackage deadbodyPackage;
 				deadbodyPackage.setAddress(node.first);
 
