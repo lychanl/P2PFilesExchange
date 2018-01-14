@@ -140,10 +140,7 @@ int UI::Parser::disconnect()
 int UI::Parser::uploadFile(string file)
 {
     files::Descriptor descriptor = fileManager->addDiskFile(file);
-    if (descriptor.name[0] == '\0')
-    {
-        Logger::getInstance().getInstance().logMessage("file not found");
-    } else
+    if (descriptor.name[0] != '\0')
         proto::Protocols::getInstance().uploadFile(descriptor);
 
     return 0;
@@ -166,10 +163,15 @@ int UI::Parser::downloadFile(string file)
 {
     for(auto a: fileManager->listAllFiles())
     {
+        Logger::getInstance().logMessage("A: " + file);
+
         if (a.name == file)
         {
+            Logger::getInstance().logMessage("before getInstance");
+
             int fd = open(file.c_str(), O_RDWR);
             proto::Protocols::getInstance().getFile(a, fd);
+            Logger::getInstance().logMessage("after getInstance");
             break;
         }
     }
