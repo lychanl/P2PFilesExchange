@@ -20,6 +20,12 @@ int UI::parseUserInput(const std::string &inputString)
 
     filenames = ui::split(inputString, ' ');
 
+    if (filenames.empty()){
+        std::cout << "invalid command" << std::endl;
+
+        return 5;
+    }
+
     if (filenames[0] == "connect"){
         if (filenames.size() < 2) {
             Logger::getInstance().logMessage("Not enough arguments for connect");
@@ -226,9 +232,7 @@ void UI::initSignals()
     sigaction(SIGINT, &sigact, (struct sigaction *) nullptr);
 }
 
-UI::~UI()
-{
-}
+UI::~UI() = default;
 
 std::vector<std::string> ui::split(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
