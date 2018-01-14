@@ -12,6 +12,7 @@ using namespace std;
 namespace ui
 {
     extern bool interruptSignalFlag;
+    extern bool connected;
 
     class UI
     {

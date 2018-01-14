@@ -7,6 +7,7 @@
 using namespace ui;
 
 bool ui::interruptSignalFlag = false;
+bool ui::connected = false;
 
 int UI::parseUserInput(const std::string &inputString)
 {
@@ -15,63 +16,55 @@ int UI::parseUserInput(const std::string &inputString)
         return parser.disconnect();
     }
 
-    if (inputString.substr(0, 7) == "connect")
-    {
-        if ((inputString.length() <= 12))
-        {
-            cout << "Invalid adress" << endl;
-            return -1;
+    vector<std::string> filenames;
+
+    filenames = ui::split(inputString, ' ');
+
+    if (filenames[0] == "connect"){
+        if (filenames.size() < 2) {
+            Logger::getInstance().logMessage("Not enough arguments for connect");
+            return 1;
         }
 
-        return parser.connect(inputString.substr(sizeof("connect"), inputString.length() - 8));
+        if (connected){
+            Logger::getInstance().logMessage("Node already connected");
+            return 4;
+        }
+
+        parser.connect(filenames[1]);
     }
-    else if (inputString == "disconnect")
+    else if (filenames[0] == "disconnect")
     {
        return parser.disconnect();
     }
-    else if(inputString.substr(0, 6) == "upload")
+    else if(filenames[0] == "upload")
     {
-        string filename;
-
-        if (inputString.length() <= 7)
-        {
-            cout << "Invalid filename" << endl;
-            return -3;
+        if (filenames.size() != 2){
+            Logger::getInstance().logMessage("Invalid arguments number for upload");
+            return 2;
         }
 
-        filename = inputString.substr(7, inputString.length() - 7);
-
-        return parser.uploadFile(filename);
+        return parser.uploadFile(filenames[1]);
     }
-    else if(inputString.substr(0, 6) == "delete")
+    else if(filenames[0] == "delete")
     {
-        string filename;
-
-        if (inputString.length() <= 7)
-        {
-            cout << "Invalid filename" << endl;
-            return -4;
+        if (filenames.size() != 2){
+            Logger::getInstance().logMessage("Invalid arguments number for delete");
+            return 3;
         }
 
-        filename = inputString.substr(7, inputString.length() - 7);
-
-        return parser.deleteFile(filename);
+        return parser.deleteFile(filenames[1]);
     }
-    else if(inputString.substr(0, 8) == "download")
+    else if(filenames[0] == "download")
     {
-        vector<std::string> filenames;
-
-        if (inputString.length() <= 9)
-        {
-            cout << "Invalid filename" << endl;
-            return -5;
+        if (filenames.size() != 3){
+            Logger::getInstance().logMessage("Invalid arguments number for download");
+            return 3;
         }
-
-        filenames = split(inputString, ' ');
 
         return parser.downloadFile(filenames[1], filenames[2]);
     }
-    else if(inputString == "la")
+    else if(filenames[0] == "la")
     {
         parser.listAll();
     }
@@ -90,6 +83,7 @@ int UI::parseUserInput(const std::string &inputString)
         cout << "download <filename src> <filename dst>" << endl;
         cout << "la (list all)" << endl;
         cout << "l (list local)" << endl;
+        filenames.clear();
     }
     return 0;
 }
@@ -124,7 +118,11 @@ int UI::Parser::connect(const std::string &address)
     fileManager->setLocalNode(conn::IPv4Address::getLocalAddress(0));
     tcpServer->run();
     udpServer->run();
-    proto::Protocols::getInstance().connect();
+    if (proto::Protocols::getInstance().connect() == proto::Protocols::Result::OK){
+        Logger::getInstance().logMessage("Connected.");
+        ui::connected = true;
+    }
+
     return 0;
 }
 

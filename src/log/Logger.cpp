@@ -7,7 +7,7 @@ void Logger::logMessage(std::string message)
     auto time = std::chrono::system_clock::now();
     std::time_t timeT = std::chrono::system_clock::to_time_t(time);
 
-    std::cout << "LOG: " << std::ctime(&timeT) << " " << message << std::endl;
+    std::cerr << "LOG: " << std::ctime(&timeT) << " " << message << std::endl;
 }
 
 void Logger::logError(std::string error)
@@ -17,7 +17,7 @@ void Logger::logError(std::string error)
     auto time = std::chrono::system_clock::now();
     std::time_t timeT = std::chrono::system_clock::to_time_t(time);
 
-    std::cout << "\033[1;31m ERROR: " << std::ctime(&timeT) << " " << error << "\033[0m\n" << std::endl;
+    std::cerr << "\033[1;31m ERROR: " << std::ctime(&timeT) << " " << error << "\033[0m\n" << std::endl;
 }
 
 void Logger::logDebug(std::string debug) {
@@ -29,7 +29,7 @@ void Logger::logDebug(std::string debug) {
     auto time = std::chrono::system_clock::now();
     std::time_t timeT = std::chrono::system_clock::to_time_t(time);
 
-    std::cout << "\033[1;34m DEBUG: " << std::ctime(&timeT) << " " <<debug << "\033[0m\n" << std::endl;
+    std::cerr << "\033[1;34m DEBUG: " << std::ctime(&timeT) << " " <<debug << "\033[0m\n" << std::endl;
 }
 
 void Logger::setShouldShowDebug(bool shouldShowDebug) {
