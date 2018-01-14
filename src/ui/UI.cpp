@@ -161,19 +161,28 @@ int UI::Parser::deleteFile(string file)
 
 int UI::Parser::downloadFile(string fileSrc, string fileDst)
 {
-    for(auto a: fileManager->listAllFiles())
+    Logger::getInstance().logDebug(std::string("downloadFile: src: " + fileSrc));
+    Logger::getInstance().logDebug(std::string("downloadFile: dst: " + fileDst));
+
+    for(auto a: fileManager->listRemoteFiles())
     {
         if (a.name == fileSrc)
         {
             Logger::getInstance().logMessage("before getInstance");
 
-            int fd = open(fileDst.c_str(), O_RDWR);
-            proto::Protocols::getInstance().getFile(a, fd);
-            Logger::getInstance().logMessage("after getInstance");
-            break;
+            const char * base = basename(fileDst.c_str());
+
+            string path = fileDst.substr(0, fileDst.length() - sizeof(base));
+
+            system(std::strncat(const_cast<char *>("mkdir -p "), path.c_str(), path.length()));
+
+            int fd = open(base, O_RDWR | O_CREAT);
+            return proto::Protocols::getInstance().getFile(a, fd);
         }
     }
-    return 0;
+
+    Logger::getInstance().logMessage(fileSrc + std::string(" not found in Remote Files."));
+    return 666;
 }
 
 void UI::Parser::listAll()
