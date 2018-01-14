@@ -11,7 +11,8 @@ int main()
     conn::IPv4Address local = conn::IPv4Address::getLocalAddress(0);
     conn::UDPBroadcaster udpBroadcaster(conn::IPv4Address::getBroadcastAddress(local, 24, conn::IPv4Address::APPLICATION_PORT));
 
-	udpBroadcaster.open();
+	conn::TCPServer tcpServer(conn::IPv4Address::APPLICATION_PORT, proto::Protocols::tcpHandler);
+	conn::UDPServer udpServer(conn::IPv4Address::APPLICATION_PORT, 2 << 16, proto::Protocols::udpHandler);
 
     files::FileManager fileManager(local, "");
 
@@ -19,7 +20,15 @@ int main()
 
     UI userInterface = UI();
 
-    userInterface.start();
+	udpBroadcaster.open();
+
+	tcpServer.run();
+	udpServer.run();
+
+	userInterface.start();
+
+	tcpServer.stop();
+	udpServer.stop();
 
     conn::TCPConnection::waitForNoConnections();
 
