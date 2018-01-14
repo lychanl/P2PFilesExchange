@@ -23,6 +23,7 @@ Descriptor FileManager::addDiskFile(const std::string &diskPath)
 	const char *baseName = basename(path.c_str());
 
 	// add file to list
+	f.node = localNode;
 	f.owner = localNode.getAddress();
 	f.date = static_cast<unsigned long long int>(time(nullptr));
 	strncpy(f.name, baseName, 52);
@@ -38,6 +39,7 @@ int FileManager::addDiskFile(const Descriptor& file, const std::string &diskPath
 	LocalFile f(localNode);
 	f = file;
 	std::string path = fileList.copyToFileDir(diskPath);
+	f.node = localNode;
 
 	// add file to list
 	f.path = path;
