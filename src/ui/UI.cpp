@@ -187,7 +187,6 @@ UI::Parser::Parser(files::FileManager* filesManager)
 
 UI::Parser::~Parser()
 {
-    delete fileManager;
 }
 
 void signalHandler(int sig)
