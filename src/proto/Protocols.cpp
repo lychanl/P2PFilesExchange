@@ -265,7 +265,7 @@ Protocols::Result Protocols::deactivateFile(const files::Descriptor &file)
 
 void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &sender)
 {
-	if (sender.getAddress() == conn::IPv4Address::getLocalAddress(0).sin_addr.s_addr)
+	if (sender.getSockaddr().sin_addr.s_addr == conn::IPv4Address::getLocalAddress(0).sin_addr.s_addr)
 		return;
 
 	Logger::getInstance().logDebug("Received datagram. Package ID: " + std::string(
