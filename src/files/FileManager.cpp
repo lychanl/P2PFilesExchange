@@ -4,12 +4,16 @@
 
 using namespace files;
 
-files::FileManager::FileManager(conn::IPv4Address localNode, const std::string& fileDir) : localNode(localNode),
-																					fileList(fileDir)
+files::FileManager::FileManager(const std::string& fileDir) : localNode(0), fileList(fileDir)
 {
 	pthread_rwlock_init(&fileListLock, nullptr);
 }
 
+int FileManager::setLocalNode(const conn::IPv4Address& localNode)
+{
+	this->localNode = localNode;
+	return 0;
+}
 
 FileManager::~FileManager()
 {

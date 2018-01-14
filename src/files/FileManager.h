@@ -15,8 +15,9 @@ namespace files
 	{
 	public:
 
-		explicit FileManager(conn::IPv4Address localNode, const std::string& fileDir);
+		explicit FileManager(const std::string& fileDir);
 		~FileManager();
+		int setLocalNode(const conn::IPv4Address& localNode);
 		// everything that returns int except openLocalFile will return 0 on success
 		Descriptor addDiskFile(const std::string &diskPath); // creates descriptor
 		int addDiskFile(const Descriptor& desc, const std::string &diskPath);
