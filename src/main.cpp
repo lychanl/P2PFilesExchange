@@ -7,10 +7,11 @@ using namespace std;
 
 int main()
 {
-	return 0;
 	conn::TCPConnection::enableConnections();
     conn::IPv4Address local = conn::IPv4Address::getLocalAddress(0);
-    conn::UDPBroadcaster udpBroadcaster(conn::IPv4Address::getBroadcastAddress(local, 24, 8080));
+    conn::UDPBroadcaster udpBroadcaster(conn::IPv4Address::getBroadcastAddress(local, 24, conn::IPv4Address::APPLICATION_PORT));
+
+	udpBroadcaster.open();
 
     files::FileManager fileManager(local, "");
 
