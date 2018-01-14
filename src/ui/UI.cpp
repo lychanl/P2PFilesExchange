@@ -22,7 +22,7 @@ int UI::parseUserInput(const std::string &inputString)
             return -1;
         }
 
-        return parser.connect(inputString.substr(12, inputString.length() - 12));
+        return parser.connect(inputString.substr(sizeof("connect"), inputString.length() - 9));
     }
     else if (inputString == "disconnect")
     {
