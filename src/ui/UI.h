@@ -16,7 +16,7 @@ namespace ui
     class UI
     {
     public:
-        UI();
+        UI(files::FileManager *fileManager);
 
         virtual ~UI();
 
@@ -33,7 +33,7 @@ namespace ui
         class Parser
         {
         public:
-            Parser();
+            Parser(files::FileManager *fileManager);
 
             // connect mask address
             int connect(const std::string& address);

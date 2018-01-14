@@ -18,7 +18,7 @@ int main()
 
     proto::Protocols::init(&udpBroadcaster, &fileManager);
 
-    UI userInterface = UI();
+    UI userInterface = UI(&fileManager);
 
 	udpBroadcaster.open();
 

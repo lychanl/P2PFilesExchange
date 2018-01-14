@@ -93,9 +93,8 @@ int UI::parseUserInput(const std::string &inputString)
     return 0;
 }
 
-UI::UI()
+UI::UI(files::FileManager *fileManager): parser(fileManager)
 {
-    parser = Parser();
     initSignals();
 }
 
@@ -181,9 +180,9 @@ void UI::Parser::listLocal()
     }
 }
 
-UI::Parser::Parser()
+UI::Parser::Parser(files::FileManager* filesManager)
 {
-    fileManager = new files::FileManager(conn::IPv4Address::getLocalAddress(0), "/localNode/files");
+    fileManager = filesManager;
 }
 
 UI::Parser::~Parser()
