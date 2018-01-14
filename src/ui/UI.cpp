@@ -174,7 +174,7 @@ int UI::Parser::downloadFile(string fileSrc, string fileDst)
 
             system(std::strncat(const_cast<char *>("mkdir -p "), path.c_str(), path.length()));
 
-            int fd = open(base, O_RDWR | O_CREAT);
+            int fd = open(fileDst.c_str(), O_RDWR | O_CREAT);
             return proto::Protocols::getInstance().getFile(a, fd);
         }
     }
