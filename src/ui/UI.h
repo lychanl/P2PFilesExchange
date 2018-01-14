@@ -44,7 +44,7 @@ namespace ui
             // delete filename
             int deleteFile(string file);
             // download filename
-            int downloadFile(string file);
+            int downloadFile(string fileSrc, string fileDst);
             // la
             void listAll();
             // l
@@ -60,6 +60,8 @@ namespace ui
 
         Parser parser;
     };
+
+    vector<string> split(const string &s, char delimiter);
 }
 
 #endif //P2PFILESEXCHANGE_UI_H

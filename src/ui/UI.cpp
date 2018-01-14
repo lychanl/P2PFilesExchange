@@ -59,7 +59,7 @@ int UI::parseUserInput(const std::string &inputString)
     }
     else if(inputString.substr(0, 8) == "download")
     {
-        string filename;
+        vector<std::string> filenames;
 
         if (inputString.length() <= 9)
         {
@@ -67,9 +67,9 @@ int UI::parseUserInput(const std::string &inputString)
             return -5;
         }
 
-        filename = inputString.substr(9, inputString.length() - 9);
+        filenames = split(inputString, ' ');
 
-        return parser.downloadFile(filename);
+        return parser.downloadFile(filenames[1], filenames[2]);
     }
     else if(inputString == "la")
     {
@@ -87,9 +87,9 @@ int UI::parseUserInput(const std::string &inputString)
         cout << "disconnect" << endl;
         cout << "upload <filename>" << endl;
         cout << "delete <filename>" << endl;
-        cout << "download <filename>" << endl;
-        cout << "la" << endl;
-        cout << "l" << endl;
+        cout << "download <filename src> <filename dst>" << endl;
+        cout << "la (list all)" << endl;
+        cout << "l (list local)" << endl;
     }
     return 0;
 }
@@ -159,17 +159,15 @@ int UI::Parser::deleteFile(string file)
     return 0;
 }
 
-int UI::Parser::downloadFile(string file)
+int UI::Parser::downloadFile(string fileSrc, string fileDst)
 {
     for(auto a: fileManager->listAllFiles())
     {
-        Logger::getInstance().logMessage("A: " + file);
-
-        if (a.name == file)
+        if (a.name == fileSrc)
         {
             Logger::getInstance().logMessage("before getInstance");
 
-            int fd = open(file.c_str(), O_RDWR);
+            int fd = open(fileDst.c_str(), O_RDWR);
             proto::Protocols::getInstance().getFile(a, fd);
             Logger::getInstance().logMessage("after getInstance");
             break;
@@ -223,4 +221,16 @@ void UI::initSignals()
 
 UI::~UI()
 {
+}
+
+std::vector<std::string> ui::split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        if (token[0] == ' ') token.erase(0, 1);
+        if (token.length() > 0)
+            tokens.push_back(token);
+    }
+    return tokens;
 }
