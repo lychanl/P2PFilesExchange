@@ -1,6 +1,7 @@
 #include <exception.h>
 #include <log/Logger.h>
 #include <fcntl.h>
+#include <conn/TCPServer.h>
 #include "UI.h"
 
 using namespace ui;
@@ -93,7 +94,7 @@ int UI::parseUserInput(const std::string &inputString)
     return 0;
 }
 
-UI::UI(files::FileManager *fileManager): parser(fileManager)
+UI::UI(files::FileManager *fileManager, conn::TCPServer *tcpServer, conn::UDPServer *udpServer): parser(fileManager,tcpServer, udpServer)
 {
     initSignals();
 }
@@ -120,6 +121,8 @@ int UI::start()
 int UI::Parser::connect(const std::string &address)
 {
     conn::IPv4Address::setLocalAddress(address);
+    tcpServer->run();
+    udpServer->run();
     proto::Protocols::getInstance().connect();
     return 0;
 }
@@ -128,6 +131,8 @@ int UI::Parser::disconnect()
 {
     std::cout << "disconnect" << std::endl;
     proto::Protocols::getInstance().disconnect();
+    tcpServer->stop();
+    udpServer->stop();
     return DISCONNECT_RETURN_VALUE;
 }
 
@@ -180,14 +185,15 @@ void UI::Parser::listLocal()
     }
 }
 
-UI::Parser::Parser(files::FileManager* filesManager)
+UI::Parser::Parser(files::FileManager* filesManager, conn::TCPServer *tcpServer, conn::UDPServer *udpServer)
 {
+    this->udpServer = udpServer;
+    this->tcpServer = tcpServer;
     fileManager = filesManager;
 }
 
 UI::Parser::~Parser()
-{
-}
+= default;
 
 void signalHandler(int sig)
 {

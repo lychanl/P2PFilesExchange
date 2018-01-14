@@ -16,7 +16,7 @@ namespace ui
     class UI
     {
     public:
-        UI(files::FileManager *fileManager);
+        UI(files::FileManager *fileManager, conn::TCPServer *tcpServer, conn::UDPServer *udpServer);
 
         virtual ~UI();
 
@@ -33,7 +33,7 @@ namespace ui
         class Parser
         {
         public:
-            Parser(files::FileManager *fileManager);
+            Parser(files::FileManager *fileManager, conn::TCPServer *tcpServer, conn::UDPServer *udpServer);
 
             // connect mask address
             int connect(const std::string& address);
@@ -53,6 +53,8 @@ namespace ui
             virtual ~Parser();
 
         private:
+            conn::TCPServer *tcpServer;
+            conn::UDPServer *udpServer;
             files::FileManager *fileManager;
         };
 
