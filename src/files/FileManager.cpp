@@ -1,11 +1,17 @@
 #include <cstring>
 #include <fcntl.h>
+#include <unistd.h>
+#include <log/Logger.h>
 #include "FileManager.h"
 
 using namespace files;
 
 files::FileManager::FileManager(const std::string& fileDir) : localNode(0), fileList(fileDir)
 {
+	if(access(fileDir.c_str(), W_OK|R_OK) == -1)
+	{
+		Logger::getInstance().logError("FileManager: Cannot access directory " + fileDir + ", errno: " + strerror(errno));
+	}
 	pthread_rwlock_init(&fileListLock, nullptr);
 }
 
@@ -25,6 +31,13 @@ Descriptor FileManager::addDiskFile(const std::string &diskPath)
 	LocalFile f(localNode);
 	std::string path = fileList.copyToFileDir(diskPath);
 	const char *baseName = basename(path.c_str());
+
+	if(path.size() == 0)
+	{
+		Logger::getInstance().logError("FileManager: Could not add file from path: " + diskPath + ", errno: " + strerror(errno));
+		f.name[0] = 0;
+		return f;
+	}
 
 	// add file to list
 	f.node = localNode;
