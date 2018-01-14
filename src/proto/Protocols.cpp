@@ -535,7 +535,7 @@ void* Protocols::_keepAliveSender(void *)
 	KeepAlivePackage package;
 	while (true)
 	{
-		sleep(2);
+		sleep(30);
 		if (!getInstance().isRedistributing)
 			getInstance().broadcaster->send(&package);
 	}
@@ -549,7 +549,7 @@ void* Protocols::_keepAliveMonitor(void *)
 		if (getInstance().isRedistributing)
 			continue;
 
-		int timeToSleep = 10000; //msec;
+		int timeToSleep = 10; //sec;
 
 		pthread_mutex_lock(&getInstance().nodesMutex);
 
@@ -560,11 +560,11 @@ void* Protocols::_keepAliveMonitor(void *)
 			if (node.first == localAddr)
 				continue;
 
-			int leftTime = node.second - getTime();
+			int leftTime = (node.second - getTime()) / 1000;
 
 			if (leftTime <= 0)
 			{
-				timeToSleep = 10000;
+				timeToSleep = 10;
 				DeadbodyPackage deadbodyPackage;
 				deadbodyPackage.setAddress(node.first);
 
@@ -583,6 +583,6 @@ void* Protocols::_keepAliveMonitor(void *)
 		if (!foundBody)
 			pthread_mutex_unlock(&getInstance().nodesMutex);
 
-		sleep(timeToSleep / 1000);
+		sleep(timeToSleep);
 	}
 }
