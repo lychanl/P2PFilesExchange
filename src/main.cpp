@@ -14,7 +14,7 @@ int main()
 	conn::TCPServer tcpServer(conn::IPv4Address::APPLICATION_PORT, proto::Protocols::tcpHandler);
 	conn::UDPServer udpServer(conn::IPv4Address::APPLICATION_PORT, 2 << 16, proto::Protocols::udpHandler);
 
-    files::FileManager fileManager("");
+    files::FileManager fileManager("files\\");
 
     proto::Protocols::init(&udpBroadcaster, &fileManager);
 

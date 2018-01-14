@@ -73,3 +73,13 @@ int UDPServer::GlobalUDPServer::_run(int socketToRead)
 
 	return 0;
 }
+
+UDPServer::~UDPServer()
+{
+	delete this->server;
+}
+
+UDPServer::GlobalUDPServer::~GlobalUDPServer()
+{
+	delete[] buffer;
+}

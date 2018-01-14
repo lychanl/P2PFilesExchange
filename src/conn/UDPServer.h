@@ -16,6 +16,7 @@ namespace conn
 		//creates a UDP server (iterating)
 		//that will listen on given port
 		UDPServer(int port, int maxDGramSize, handler handler);
+		~UDPServer();
 	private:
 
 		class GlobalUDPServer : public Server::GlobalServer
