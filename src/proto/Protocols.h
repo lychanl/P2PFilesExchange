@@ -53,7 +53,7 @@ namespace proto
 		volatile bool isRedistributing = false;
 
 		void broadcastFilesList();
-		void redistribute(bool disconnecting);
+		void redistribute(bool separateThread, bool disconnecting);
 		void sendFile(files::Descriptor& descriptor, conn::TCPConnection& connection);
 		void receiveFile(files::Descriptor& descriptor, conn::TCPConnection& connection);
 

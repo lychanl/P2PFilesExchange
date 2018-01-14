@@ -69,7 +69,7 @@ Protocols::Result Protocols::connect()
 	if (broadcaster->send(&connPackage))
 		return Result::FAILED;
 
-	redistribute(false);
+	redistribute(false, false);
 
 	if (!keepAliveThreadsRunning)
 	{
@@ -90,7 +90,7 @@ void Protocols::disconnect()
 
 	broadcaster->send(&disconnectPackage);
 
-	redistribute(true);
+	redistribute(false, true);
 }
 
 void Protocols::missingNode(const conn::IPv4Address& addr)
@@ -279,15 +279,15 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 
 	if (memcmp(buffer, ConnectPackage::ID, 4) == 0)
 	{
-		Protocols::getInstance().redistribute(false);
+		Protocols::getInstance().redistribute(true, false);
 	}
 	else if (memcmp(buffer, DeadbodyPackage::ID, 4) == 0)
 	{
-		Protocols::getInstance().redistribute(false);
+		Protocols::getInstance().redistribute(true, false);
 	}
 	else if (memcmp(buffer, DisconnectPackage::ID, 4) == 0)
 	{
-		Protocols::getInstance().redistribute(false);
+		Protocols::getInstance().redistribute(true, false);
 	}
 	else if (memcmp(buffer, HelloPackage::ID, 4) == 0)
 	{
@@ -505,12 +505,17 @@ void* Protocols::_redistribute(void*)
 	return nullptr;
 }
 
-void Protocols::redistribute(bool disconnecting)
+void Protocols::redistribute(bool separateThread, bool disconnecting)
 {
-	pthread_mutex_lock(&greetedNodesMutex);
+	bool wasRedistributing = isRedistributing;
 
-	if (isRedistributing)
-		return;
+	if (!disconnecting)
+	{
+		HelloPackage helloPackage;
+		broadcaster->send(&helloPackage);
+	}
+
+	pthread_mutex_lock(&greetedNodesMutex);
 
 	isRedistributing = true;
 
@@ -519,20 +524,22 @@ void Protocols::redistribute(bool disconnecting)
 
 	pthread_mutex_unlock(&greetedNodesMutex);
 
-	if (!disconnecting)
+	if (!wasRedistributing && separateThread)
 	{
-		HelloPackage helloPackage;
-		broadcaster->send(&helloPackage);
+		pthread_t thread;
+		pthread_create(&thread, nullptr, _redistribute, nullptr);
+		pthread_detach(thread);
 	}
-
-	pthread_t thread;
-	pthread_create(&thread, nullptr, _redistribute, nullptr);
-	pthread_detach(thread);
+	else if (!separateThread)
+	{
+		_redistribute(nullptr);
+	}
 }
 
 void* Protocols::_keepAliveSender(void *)
 {
 	KeepAlivePackage package;
+	while (true) sleep(10000);
 	while (true)
 	{
 		sleep(30);
@@ -544,6 +551,7 @@ void* Protocols::_keepAliveSender(void *)
 void* Protocols::_keepAliveMonitor(void *)
 {
 	int localAddr = conn::IPv4Address::getLocalAddress(0).sin_addr.s_addr;
+	while (true) sleep(10000);
 	while (true)
 	{
 		if (getInstance().isRedistributing)
