@@ -42,7 +42,7 @@ void DeletePackage::parseData()
 
 void DeletePackage::serialize()
 {
-	put((void*)ID, sizeof(ID), 0);
+	put((void*)ID, 4, 0);
 	put((unsigned)descriptor.owner, 4);
 	put((unsigned)(this->descriptor.date >> 32), 8);
 	put((unsigned)(this->descriptor.date), 12);

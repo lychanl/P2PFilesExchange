@@ -28,5 +28,5 @@ void OkPackage::parseData()
 
 void OkPackage::serialize()
 {
-	put ((void*)ID, sizeof(ID), 0);
+	put ((void*)ID, 4, 0);
 }

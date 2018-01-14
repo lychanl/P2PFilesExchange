@@ -33,7 +33,7 @@ void FilePackage::parseData()
 
 void FilePackage::serialize()
 {
-	put((void*)ID, sizeof(ID), 0);
+	put((void*)ID, 4, 0);
 	put(this->size, 4);
 	put((unsigned)(this->leftSize >> 32), 8);
 	put((unsigned)(this->leftSize), 12);

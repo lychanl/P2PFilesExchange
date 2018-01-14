@@ -27,5 +27,5 @@ void HelloPackage::parseData()
 
 void HelloPackage::serialize()
 {
-	put ((void*)ID, sizeof(ID), 0);
+	put ((void*)ID, 4, 0);
 }

@@ -39,6 +39,6 @@ void DeadbodyPackage::parseData()
 
 void DeadbodyPackage::serialize()
 {
-	put ((void*)ID, sizeof(ID), 0);
+	put ((void*)ID, 4, 0);
 	put((unsigned)this->address.getAddress(), 4);
 }

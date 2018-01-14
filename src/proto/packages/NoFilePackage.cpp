@@ -51,7 +51,7 @@ void NoFilePackage::parseData()
 
 void NoFilePackage::serialize()
 {
-	put((void*)ID, sizeof(ID), 0);
+	put((void*)ID, 4, 0);
 	put(this->reason, 4);
 	if(this->reason == Reason::AWAY)
 		put((unsigned)this->sentTo.getAddress(), 8);
