@@ -121,6 +121,7 @@ int UI::start()
 int UI::Parser::connect(const std::string &address)
 {
     conn::IPv4Address::setLocalAddress(address);
+    fileManager->setLocalNode(conn::IPv4Address::getLocalAddress(0));
     tcpServer->run();
     udpServer->run();
     proto::Protocols::getInstance().connect();
@@ -138,7 +139,7 @@ int UI::Parser::disconnect()
 
 int UI::Parser::uploadFile(string file)
 {
-    fileManager->addDiskFile(file);
+    proto::Protocols::getInstance().uploadFile(fileManager->addDiskFile(file));
     return 0;
 }
 
