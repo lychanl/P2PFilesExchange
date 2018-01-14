@@ -232,7 +232,7 @@ void* Protocols::_uploadFile(void* arg)
 		getInstance().fileManager->makeLocalFileRemote(*file, conn::IPv4Address(targetAddress.getAddress(), 0));
 	}
 
-
+	getInstance().broadcastFilesList();
 	delete file;
 }
 
