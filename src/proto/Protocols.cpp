@@ -434,7 +434,7 @@ void Protocols::sendFile(files::Descriptor& descriptor, conn::TCPConnection& con
 
 void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& connection)
 {
-	std::string fileName = std::string("files/temp/") + descriptor.name;
+	std::string fileName = std::string("files") + descriptor.name;
 
 	FILE* file = fopen(fileName.c_str(), "wb");
 
