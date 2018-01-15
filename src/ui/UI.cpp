@@ -55,6 +55,11 @@ int UI::parseUserInput(const std::string &inputString)
     }
     else if(filenames[0] == "upload")
     {
+        if (!connected){
+            Logger::getInstance().logDebug("Not connected");
+            return 8;
+        }
+
         if (filenames.size() != 2){
             Logger::getInstance().logMessage("Invalid arguments number for upload");
             return 2;
@@ -64,6 +69,11 @@ int UI::parseUserInput(const std::string &inputString)
     }
     else if(filenames[0] == "delete")
     {
+        if (!connected){
+            Logger::getInstance().logDebug("Not connected");
+            return 8;
+        }
+
         if (filenames.size() != 2){
             Logger::getInstance().logMessage("Invalid arguments number for delete");
             return 3;
@@ -73,6 +83,11 @@ int UI::parseUserInput(const std::string &inputString)
     }
     else if(filenames[0] == "download")
     {
+        if (!connected){
+            Logger::getInstance().logDebug("Not connected");
+            return 8;
+        }
+
         if (filenames.size() != 3){
             Logger::getInstance().logMessage("Invalid arguments number for download");
             return 3;
@@ -82,10 +97,20 @@ int UI::parseUserInput(const std::string &inputString)
     }
     else if(filenames[0] == "la")
     {
+        if (!connected){
+            Logger::getInstance().logDebug("Not connected");
+            return 8;
+        }
+
         parser.listAll();
     }
     else if(inputString == "l")
     {
+        if (!connected){
+            Logger::getInstance().logDebug("Not connected");
+            return 8;
+        }
+
         parser.listLocal();
     }
     else
