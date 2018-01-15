@@ -49,6 +49,7 @@ int UI::parseUserInput(const std::string &inputString)
     else if (filenames[0] == "disconnect")
     {
         if (connected) {
+            Logger::getInstance().logDebug("before disconnect");
             return parser.disconnect();
         }
     }
