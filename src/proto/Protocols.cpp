@@ -161,6 +161,8 @@ Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 
 void* Protocols::_uploadFile(void* arg)
 {
+	Logger::getInstance().logDebug("nodes in _uploadFile: " + getInstance().nodes.size());
+
 	if (getInstance().nodes.size() == 0)
 		return nullptr;
 
@@ -205,6 +207,8 @@ void* Protocols::_uploadFile(void* arg)
 					}
 
 					int sizeToSend = leftSize > FilePackage::MAX_DATA_SIZE ? FilePackage::MAX_DATA_SIZE : leftSize;
+
+					Logger::getInstance().logDebug("SizeToSend: " + sizeToSend);
 
 					char *buffer = nullptr;
 
