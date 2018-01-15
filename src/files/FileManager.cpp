@@ -146,9 +146,9 @@ int FileManager::addRemoteFiles(const std::vector<Descriptor> &descriptors, cons
 		}
 		else if (it->second < date) // new list, delete all descriptors from this node
 		{
-			fileList.deleteFromNode(it->first);
 			Logger::getInstance().logDebug(
 					std::string("FileManager: new list, deleting old descriptors from node: ") + std::string(node));
+			fileList.deleteFromNode(it->first);
 		}
 	}
 	// if new or current list add/update date entry and descriptor entries
@@ -171,8 +171,8 @@ int FileManager::removeRemoteFile(const Descriptor &descriptor)
 	pthread_rwlock_wrlock(&fileListLock);
 	try
 	{
-		fileList.deleteRemoteFile(descriptor);
 		Logger::getInstance().logDebug(std::string("FileManager: removing remote file desc: ") + descriptor.name);
+		fileList.deleteRemoteFile(descriptor);
 		pthread_rwlock_unlock(&fileListLock);
 		return 0;
 	} catch (std::out_of_range &e)
@@ -185,8 +185,8 @@ int FileManager::removeRemoteFile(const Descriptor &descriptor)
 int FileManager::removeRemoteFilesFromNode(const conn::IPv4Address &node)
 {
 	pthread_rwlock_wrlock(&fileListLock);
-	fileList.deleteFromNode(node.getAddress());
 	Logger::getInstance().logDebug(std::string("FileManager: removing descriptors from node: ") + std::string(node));
+	fileList.deleteFromNode(node.getAddress());
 	pthread_rwlock_unlock(&fileListLock);
 	return 0;
 }
@@ -206,9 +206,9 @@ int FileManager::deactivateLocalFile(const Descriptor &file)
 		{
 			pthread_mutex_unlock(&f.mutex);
 			remove(f.path.c_str());
-			fileList.deleteLocalFile(f); //delete from file list
 			Logger::getInstance().logDebug(
 					std::string("FileManager: immediately removing deactivated file from path: ") + f.path);
+			fileList.deleteLocalFile(f); //delete from file list
 			pthread_rwlock_unlock(&fileListLock);
 			return 0;
 
@@ -266,9 +266,9 @@ int FileManager::closeLocalFile(const Descriptor &file)
 			pthread_mutex_unlock(&f.mutex);
 			pthread_mutex_destroy(&f.mutex);
 			remove(f.path.c_str()); // at this point, no other thread should be waiting for it
-			fileList.deleteLocalFile(f); //delete from file list
 			Logger::getInstance().logDebug(
 					std::string("FileManager: closed file was deactivated, deleting file from path: ") + f.path);
+			fileList.deleteLocalFile(f); //delete from file list
 			pthread_rwlock_unlock(&fileListLock);
 			return 0;
 		}
@@ -298,12 +298,12 @@ int FileManager::makeLocalFileRemote(const Descriptor &file, const conn::IPv4Add
 		{
 			pthread_mutex_unlock(&f.mutex);
 			remove(f.path.c_str());
-			fileList.deleteLocalFile(f); //delete from file list
 			Logger::getInstance().logDebug(std::string("FileManager: immediately deleting file from path: ") + f.path);
+			fileList.deleteLocalFile(f); //delete from file list
 		}
 		else pthread_mutex_unlock(&f.mutex);
 		fileList.addRemoteFile(newF);
-		Logger::getInstance().logDebug(std::string("FileManager: added file as remote file: ") + f.name);
+		Logger::getInstance().logDebug(std::string("FileManager: added file as remote file: ") + newF.name);
 		pthread_rwlock_unlock(&fileListLock);
 		return 0;
 	} catch (std::out_of_range &e)
