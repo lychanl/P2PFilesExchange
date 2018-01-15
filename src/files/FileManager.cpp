@@ -332,3 +332,8 @@ bool FileManager::isActive(const Descriptor &localFile)
 		return false;
 	}
 }
+
+const std::string &FileManager::getFileDir() const
+{
+    return fileList.getFileDir();
+}

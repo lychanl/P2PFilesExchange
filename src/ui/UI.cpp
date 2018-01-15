@@ -2,6 +2,7 @@
 #include <log/Logger.h>
 #include <fcntl.h>
 #include <conn/TCPServer.h>
+#include <fstream>
 #include "UI.h"
 
 using namespace ui;
@@ -176,7 +177,7 @@ int UI::Parser::downloadFile(string fileSrc, string fileDst)
     Logger::getInstance().logDebug(std::string("downloadFile: src: " + fileSrc));
     Logger::getInstance().logDebug(std::string("downloadFile: dst: " + fileDst));
 
-    for(auto a: fileManager->listRemoteFiles())
+    for(auto a: fileManager->listAllFiles())
     {
         if (a.name == fileSrc)
         {
@@ -188,8 +189,21 @@ int UI::Parser::downloadFile(string fileSrc, string fileDst)
 
             system(std::strncat(const_cast<char *>("mkdir -p "), path.c_str(), path.length()));
 
-            int fd = open(fileDst.c_str(), O_RDWR | O_CREAT);
-            return proto::Protocols::getInstance().getFile(a, fd);
+            std::vector<files::Descriptor> local = fileManager->listLocalFiles();
+
+            if (std::count(local.begin(), local.end(), a) > 0)
+            {
+                std::ifstream  src(strncat(const_cast<char *>(fileManager->getFileDir().c_str()), fileSrc.c_str(), fileSrc.length()), std::ios::binary);
+                std::ofstream  dst(fileDst, std::ios::binary);
+
+                dst << src.rdbuf();
+            }
+            else
+            {
+                int fd = open(fileDst.c_str(), O_RDWR | O_CREAT);
+
+                return proto::Protocols::getInstance().getFile(a, fd);
+            }
         }
     }
 
