@@ -155,7 +155,7 @@ int TCPConnection::send(const void *buffer, size_t n)
 	size_t sent;
 	while (left > 0)
 	{
-		sent = ::send(socket, buffer + offset, left, 0);
+		sent = ::send(socket, (const char*)buffer + offset, left, 0);
 		if (sent < 0)
 		{
 			error = errno;
@@ -199,7 +199,7 @@ int TCPConnection::recv(void *buffer, size_t n)
 
 	while (left > 0)
 	{
-		received = ::recv(socket, buffer + offset, left, 0);
+		received = ::recv(socket, (char*)buffer + offset, left, 0);
 		if (received < 0)
 		{
 			error = errno;
