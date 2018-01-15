@@ -367,6 +367,7 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 			return;
 
 		Protocols::getInstance().receiveFile(package.getDescriptor(), conn);
+		getInstance().broadcastFilesList();
 	}
 }
 
