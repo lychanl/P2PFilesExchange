@@ -154,3 +154,8 @@ int FileList::deleteFromNode(unsigned long int nodeAddress)
 	}
 	return 0;
 }
+
+const std::string &FileList::getFileDir() const
+{
+    return fileDir;
+}

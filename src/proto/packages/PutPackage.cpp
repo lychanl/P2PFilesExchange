@@ -14,7 +14,7 @@ PutPackage::PutPackage()
 
 int PutPackage::getSerializedSize()
 {
-	return 8;
+	return 72;
 }
 
 files::Descriptor& PutPackage::getDescriptor()

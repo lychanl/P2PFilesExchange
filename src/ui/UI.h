@@ -7,6 +7,7 @@
 #include <files/FileManager.h>
 #include <conn/IPv4Address.h>
 #include <proto/Protocols.h>
+#include <algorithm>
 using namespace std;
 
 namespace ui

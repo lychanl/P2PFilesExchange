@@ -38,6 +38,8 @@ namespace files
 
 		const LocalFile &findLocalFile(const Descriptor& file) const;
 
+		const std::string &getFileDir() const;
+
 	private:
 		std::unordered_map<Descriptor, File, DescriptorHasher> remoteFiles;
 		std::unordered_map<Descriptor, LocalFile, DescriptorHasher> localFiles;

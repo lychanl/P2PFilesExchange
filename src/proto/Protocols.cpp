@@ -314,8 +314,9 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 	else if (memcmp(buffer, ListPackage::ID, 4) == 0)
 	{
 		ListPackage listPackage;
-		int headerSize = static_cast<Package*>(&listPackage)->parseHeader(buffer);
-		static_cast<Package*>(&listPackage)->parseData((char*)buffer + headerSize);
+
+		static_cast<Package*>(&listPackage)->parseHeader(buffer);
+		static_cast<Package*>(&listPackage)->parseData((char*)buffer + static_cast<Package*>(&listPackage)->getHeaderSize());
 
 		Protocols::getInstance().fileManager->addRemoteFiles(listPackage.getFiles(), conn::IPv4Address(sender.getAddress(), 0), listPackage.getTime());
 	}
@@ -342,6 +343,7 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 			Protocols::getInstance().deactivateFile(package.getDescriptor());
 		}
 
+		getInstance().broadcastFilesList();
 	}
 	else if (memcmp(ID, GetPackage::ID, 4) == 0)
 	{
