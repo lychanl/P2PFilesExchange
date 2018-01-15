@@ -498,7 +498,7 @@ void Protocols::broadcastFilesList()
 	} while (localFiles.size() > sent);
 }
 
-void* Protocols::_redistribute(void*)
+void* Protocols::_redistribute(void* arg)
 {
 	sleep(5);
 
@@ -520,7 +520,12 @@ void* Protocols::_redistribute(void*)
 	auto localFiles = getInstance().fileManager->listLocalFiles();
 
 	for (auto& file : localFiles)
-		getInstance().uploadFile(file);
+	{
+		if (arg == nullptr)
+			getInstance().uploadFile(file);
+		else
+			_uploadFile(&file);
+	}
 
 	getInstance().broadcastFilesList();
 
@@ -554,7 +559,7 @@ void Protocols::redistribute(bool separateThread, bool disconnecting)
 	}
 	else if (!separateThread)
 	{
-		_redistribute(nullptr);
+		_redistribute((void*)1);
 	}
 }
 
