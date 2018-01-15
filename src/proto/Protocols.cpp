@@ -161,7 +161,7 @@ Protocols::Result Protocols::getFile(const files::Descriptor &file, int fd)
 
 void* Protocols::_uploadFile(void* arg)
 {
-	Logger::getInstance().logDebug("nodes in _uploadFile: " + getInstance().nodes.size());
+	Logger::getInstance().logDebug("nodes in _uploadFile: " + std::to_string(getInstance().nodes.size()));
 
 	if (getInstance().nodes.size() == 0)
 		return nullptr;
