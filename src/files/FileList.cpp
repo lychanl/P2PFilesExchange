@@ -87,6 +87,10 @@ std::string FileList::copyToFileDir(const std::string& in)
 	{
 		out = fileDir + "/" + baseName;
 	}
+	if(in == out)
+	{
+		return in;
+	}
 	if ((input = open(in.c_str(), O_RDONLY)) == -1)
 	{
 		return "";
