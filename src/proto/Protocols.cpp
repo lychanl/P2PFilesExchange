@@ -457,7 +457,7 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 
 		if (filePackage.getSize() == filePackage.getLeftSize())
 			finished = true;
-	} while(finished);
+	} while(!finished);
 
 	fclose(file);
 
