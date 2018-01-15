@@ -28,7 +28,7 @@ int main()
 	tcpServer.stop();
 	udpServer.stop();
 
-    conn::TCPConnection::waitForNoConnections();
+    //conn::TCPConnection::waitForNoConnections();
 
     return 0;
 
