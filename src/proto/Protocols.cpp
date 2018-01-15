@@ -285,8 +285,7 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 					((char *) buffer)[0],
 					((char *) buffer)[1],
 					((char *) buffer)[2],
-					((char *) buffer)[3],
-					'\0'
+					((char *) buffer)[3]
 			}) + " Sender: " + (std::string)sender);
 
 	if (memcmp(buffer, ConnectPackage::ID, 4) == 0)
@@ -327,6 +326,10 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 
 		Protocols::getInstance().fileManager->addRemoteFiles(listPackage.getFiles(), conn::IPv4Address(sender.getAddress(), 0), listPackage.getTime());
 	}
+	else
+	{
+		Logger::getInstance().logMessage("Invalid package");
+	}
 }
 
 void Protocols::tcpHandler(conn::TCPConnection &conn)
@@ -336,7 +339,7 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 	if (conn.recv(ID, 4) != 0)
 		return;
 
-	Logger::getInstance().logDebug("Received connection. Package ID: " + std::string({ID[0], ID[1], ID[2], ID[3], '\0'})
+	Logger::getInstance().logDebug("Received connection. Package ID: " + std::string({ID[0], ID[1], ID[2], ID[3]})
 								   + " Sender: " + (std::string)conn.getRemoteAddress());
 
 	if (memcmp(ID, DeletePackage::ID, 4) == 0)
