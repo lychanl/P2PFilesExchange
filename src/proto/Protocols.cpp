@@ -208,7 +208,7 @@ void* Protocols::_uploadFile(void* arg)
 
 					int sizeToSend = leftSize > FilePackage::MAX_DATA_SIZE ? FilePackage::MAX_DATA_SIZE : leftSize;
 
-					Logger::getInstance().logDebug("SizeToSend: " + sizeToSend);
+					Logger::getInstance().logDebug("SizeToSend: " + std::to_string(sizeToSend));
 
 					char *buffer = nullptr;
 
