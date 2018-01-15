@@ -181,7 +181,7 @@ void* Protocols::_uploadFile(void* arg)
 			return nullptr;
 		}
 
-		FILE *stream = fdopen(fd, "rb");
+		FILE *stream = fdopen(fd, "r");
 
 		fseek(stream, 0, SEEK_END);
 		int leftSize = ftell(stream);
@@ -403,7 +403,7 @@ void Protocols::sendFile(files::Descriptor& descriptor, conn::TCPConnection& con
 		return;
 	}
 
-	FILE* fstream = fdopen(fd, "rb");
+	FILE* fstream = fdopen(fd, "r");
 	fseek(fstream, 0, SEEK_END);
 	int leftSize = ftell(fstream);
 	rewind(fstream);
@@ -436,7 +436,7 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 {
 	std::string fileName = std::string("files/") + descriptor.name;
 
-	FILE* file = fopen(fileName.c_str(), "wb");
+	FILE* file = fopen(fileName.c_str(), "w");
 
 	if (file == nullptr)
 		return;
