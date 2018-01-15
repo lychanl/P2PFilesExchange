@@ -436,7 +436,7 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 {
 	std::string fileName = std::string("files/") + descriptor.name;
 
-	FILE* file = fopen(fileName.c_str(), "w");
+	FILE* file = fopen(fileName.c_str(), "wb");
 
 	if (file == nullptr)
 		return;
@@ -458,8 +458,9 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 
 		if (filePackage.getSize() > 0)
 		{
-			fwrite(filePackage.getDataPtr(), filePackage.getSize(), 1, file);
-			Logger::getInstance().logDebug(std::string("Written ") + std::to_string(filePackage.getSize()) + " bytes to file");
+			int ret = fwrite(filePackage.getDataPtr(), filePackage.getSize(), 1, file);
+			Logger::getInstance().logDebug(std::string("Written ") + std::to_string(ret) + " bytes to file");
+			Logger::getInstance().logMessage(std::string((char*)filePackage.getDataPtr()));
 		}
 
 		if (filePackage.getSize() == filePackage.getLeftSize())
