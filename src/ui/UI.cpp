@@ -13,26 +13,32 @@ int UI::parseUserInput(const std::string &inputString)
 {
     if (interruptSignalFlag)
     {
-        return parser.disconnect();
+        if (connected)
+            return parser.disconnect();
+        else
+            return DISCONNECT_RETURN_VALUE;
     }
 
     vector<std::string> filenames;
 
     filenames = ui::split(inputString, ' ');
 
-    if (filenames.empty()){
+    if (filenames.empty())
+    {
         std::cout << "invalid command" << std::endl;
-
         return 5;
     }
 
-    if (filenames[0] == "connect"){
-        if (filenames.size() < 2) {
+    if (filenames[0] == "connect")
+    {
+        if (filenames.size() < 2)
+        {
             Logger::getInstance().logMessage("Not enough arguments for connect");
             return 1;
         }
 
-        if (connected){
+        if (connected)
+        {
             Logger::getInstance().logMessage("Node already connected");
             return 4;
         }
@@ -41,7 +47,9 @@ int UI::parseUserInput(const std::string &inputString)
     }
     else if (filenames[0] == "disconnect")
     {
-       return parser.disconnect();
+        if (connected) {
+            return parser.disconnect();
+        }
     }
     else if(filenames[0] == "upload")
     {
@@ -212,8 +220,7 @@ UI::Parser::Parser(files::FileManager* filesManager, conn::TCPServer *tcpServer,
     fileManager = filesManager;
 }
 
-UI::Parser::~Parser()
-= default;
+UI::Parser::~Parser() = default;
 
 void signalHandler(int sig)
 {
@@ -234,7 +241,8 @@ void UI::initSignals()
 
 UI::~UI() = default;
 
-std::vector<std::string> ui::split(const std::string &s, char delimiter) {
+std::vector<std::string> ui::split(const std::string &s, char delimiter)
+{
     std::vector<std::string> tokens;
     std::string token;
     std::istringstream tokenStream(s);
