@@ -247,7 +247,7 @@ std::vector<std::string> ui::split(const std::string &s, char delimiter)
     std::string token;
     std::istringstream tokenStream(s);
     while (std::getline(tokenStream, token, delimiter)) {
-        if (token[0] == ' ') token.erase(0, 1);
+        if (token[0] == delimiter) token.erase(0, 1);
         if (token.length() > 0)
             tokens.push_back(token);
     }
