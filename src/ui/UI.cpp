@@ -214,7 +214,7 @@ int UI::Parser::downloadFile(string fileSrc, string fileDst)
             string path = fileDst.substr(0, fileDst.length() - strlen(base));
 
 
-            system(std::strncat(const_cast<char *>("mkdir -p "), path.c_str(), path.length() + 1));
+            system(("mkdir -p "+ path).c_str());
 
             std::vector<files::Descriptor> local = fileManager->listLocalFiles();
 
