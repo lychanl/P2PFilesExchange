@@ -21,7 +21,7 @@ namespace files
 
 	struct DescriptorHasher
 	{
-		std::size_t operator()(const Descriptor &d) const
+		/*std::size_t operator()(const Descriptor &d) const
 		{
 			using std::size_t;
 			using std::hash;
@@ -33,6 +33,13 @@ namespace files
 
 			return ((hash<unsigned long int>()(d.owner) ^ (hash<unsigned long long int>()(d.date) << 1)) >> 1) ^
 				   (hash<string>()(d.name) << 1);
+		}*/
+		std::size_t operator()(const Descriptor &d) const
+		{
+			using std::string;
+			using std::to_string;
+			string desc = to_string(d.owner) + to_string(d.date) + d.name;
+
 		}
 	};
 
@@ -63,7 +70,7 @@ namespace files
 
 		int state;
 		bool active = true;
-		std::string path;
+		std::string path = "";
 		size_t threadCount = 0;
 		pthread_mutex_t mutex;
 	};

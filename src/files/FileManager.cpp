@@ -206,9 +206,9 @@ int FileManager::deactivateLocalFile(const Descriptor &file)
 		{
 			pthread_mutex_unlock(&f.mutex);
 			remove(f.path.c_str());
-			fileList.deleteLocalFile(f); //delete from file list
 			Logger::getInstance().logDebug(
 					std::string("FileManager: immediately removing deactivated file from path: ") + f.path);
+			fileList.deleteLocalFile(f); //delete from file list
 			pthread_rwlock_unlock(&fileListLock);
 			return 0;
 
@@ -266,9 +266,9 @@ int FileManager::closeLocalFile(const Descriptor &file)
 			pthread_mutex_unlock(&f.mutex);
 			pthread_mutex_destroy(&f.mutex);
 			remove(f.path.c_str()); // at this point, no other thread should be waiting for it
-			fileList.deleteLocalFile(f); //delete from file list
 			Logger::getInstance().logDebug(
 					std::string("FileManager: closed file was deactivated, deleting file from path: ") + f.path);
+			fileList.deleteLocalFile(f); //delete from file list
 			pthread_rwlock_unlock(&fileListLock);
 			return 0;
 		}
