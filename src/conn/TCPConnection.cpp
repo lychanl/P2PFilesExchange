@@ -152,7 +152,7 @@ int TCPConnection::send(const void *buffer, size_t n)
 
 	size_t offset = 0;
 	size_t left = n;
-	size_t sent;
+	int sent;
 	while (left > 0)
 	{
 		sent = ::send(socket, (const char*)buffer + offset, left, 0);
@@ -163,7 +163,10 @@ int TCPConnection::send(const void *buffer, size_t n)
 
 			Logger::getInstance().logError("TCPConnection: Error while sending. Errno: " + error);
 
-			return -1;
+			if (error == 11)
+				sent = 0;
+			else
+				return -1;
 		}
 
 		left -= sent;
@@ -195,23 +198,26 @@ int TCPConnection::recv(void *buffer, size_t n)
 
 	size_t offset = 0;
 	size_t left = n;
-	size_t received;
+	int received;
 
 	while (left > 0)
 	{
-		received = ::recv(socket, (char*)buffer + offset, left, 0);
+		received = ::recv(socket, buffer, left, 0);
 		if (received < 0)
 		{
 			error = errno;
 			status = STATUS_ERR;
 
-			Logger::getInstance().logError("TCPConnection: Error while receiving. Errno: " + error);
+			Logger::getInstance().logError("TCPConnection: Error while receiving. Errno: " + std::to_string(error));
 
-			return -1;
+			if (error == 11)
+				received = 0;
+			else
+				return -1;
 		}
 
 		left -= received;
-		offset += received;
+		buffer = (char*)buffer + received;
 	}
 
 	return 0;
