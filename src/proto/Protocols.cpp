@@ -334,10 +334,13 @@ void Protocols::udpHandler(void *buffer, int recvData, const conn::IPv4Address &
 
 void Protocols::tcpHandler(conn::TCPConnection &conn)
 {
-	char ID[4];
+	char* ID = new char[4];
 
 	if (conn.recv(ID, 4) != 0)
+	{
+		delete[] ID;
 		return;
+	}
 
 	Logger::getInstance().logDebug("Received connection. Package ID: " + std::string({ID[0], ID[1], ID[2], ID[3]})
 								   + " Sender: " + (std::string)conn.getRemoteAddress());
@@ -346,7 +349,10 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 	{
 		DeletePackage package;
 		if (conn.recvNoId(&package) != 0)
+		{
+			delete[] ID;
 			return;
+		}
 
 		if (Protocols::getInstance().fileManager->deactivateLocalFile(package.getDescriptor()) != 0)
 		{
@@ -359,7 +365,10 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 	{
 		GetPackage package;
 		if (conn.recvNoId(&package) != 0)
+		{
+			delete[] ID;
 			return;
+		}
 
 		Protocols::getInstance().sendFile(package.getDescriptor(), conn);
 	}
@@ -367,11 +376,16 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 	{
 		PutPackage package;
 		if (conn.recvNoId(&package) != 0)
+		{
+			delete[] ID;
 			return;
+		}
 
 		Protocols::getInstance().receiveFile(package.getDescriptor(), conn);
 		getInstance().broadcastFilesList();
 	}
+
+	delete[] ID;
 }
 
 void Protocols::sendFile(files::Descriptor& descriptor, conn::TCPConnection& connection)
