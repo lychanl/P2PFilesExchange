@@ -17,6 +17,12 @@ TCPConnection::TCPConnection(int socket, const IPv4Address& address) : socket(so
 	connections++;
 
 	pthread_mutex_unlock(&connectionsMutex);
+
+	struct timeval timeout;
+	timeout.tv_sec = 5;
+	timeout.tv_usec = 0;
+
+	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 }
 
 TCPConnection::TCPConnection(const IPv4Address& address) : remoteAddr(address)
@@ -26,6 +32,12 @@ TCPConnection::TCPConnection(const IPv4Address& address) : remoteAddr(address)
 		Logger::getInstance().logError("TCPConnection: Error while creating or binding socket. Errno: " + error);
 		return;
 	}
+
+	struct timeval timeout;
+	timeout.tv_sec = 5;
+	timeout.tv_usec = 0;
+
+	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
 
 	connect();
 }
