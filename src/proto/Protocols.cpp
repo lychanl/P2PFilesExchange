@@ -254,6 +254,9 @@ Protocols::Result Protocols::deactivateFile(const files::Descriptor &file)
 {
 	conn::IPv4Address node = conn::IPv4Address(fileManager->getNode(file).getAddress(), conn::IPv4Address::APPLICATION_PORT);
 
+	if (node.getAddress() == 0)
+		return Result::CANNOT_FIND_FILE;
+
 	for (int i = 0; i < MAX_RERUNS; i++)
 	{
 		DeletePackage deletePackage;
@@ -450,7 +453,7 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 
 		if (filePackage.getSize() == filePackage.getLeftSize())
 			finished = true;
-	} while(true);
+	} while(finished);
 
 	fclose(file);
 
