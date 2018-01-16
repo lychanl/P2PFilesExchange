@@ -529,6 +529,7 @@ void* Protocols::_redistribute(void* arg)
 	for (auto node : getInstance().greetedNodes)
 		getInstance().nodes[node] = getTime();
 
+	getInstance().fileManager->setActiveNodes(getInstance().greetedNodes);
 	getInstance().greetedNodes.clear();
 
 	pthread_mutex_unlock(&getInstance().greetedNodesMutex);

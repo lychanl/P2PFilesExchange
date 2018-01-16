@@ -6,6 +6,7 @@
 #include <conn/IPv4Address.h>
 #include <vector>
 #include <unordered_map>
+#include <set>
 
 #include "FileList.h"
 
@@ -35,6 +36,8 @@ namespace files
 
 		int openLocalFile(const Descriptor& file); // for reading, returns -1 on failure
 		int closeLocalFile(const Descriptor& file);
+
+		int setActiveNodes(std::set<unsigned int> nodes);
 
 		const conn::IPv4Address getNode(const Descriptor& file);
 
