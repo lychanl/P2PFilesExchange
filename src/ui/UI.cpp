@@ -173,6 +173,7 @@ int UI::Parser::disconnect()
     proto::Protocols::getInstance().disconnect();
     tcpServer->stop();
     udpServer->stop();
+    system("rm -f files/*");
     return DISCONNECT_RETURN_VALUE;
 }
 
