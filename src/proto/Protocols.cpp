@@ -538,7 +538,7 @@ void* Protocols::_redistribute(void* arg)
 		if (arg == nullptr)
 			getInstance().uploadFile(file);
 		else
-			_uploadFile(&file);
+			_uploadFile(new files::Descriptor(file));
 	}
 
 	getInstance().broadcastFilesList();
@@ -580,10 +580,9 @@ void Protocols::redistribute(bool separateThread, bool disconnecting)
 void* Protocols::_keepAliveSender(void *)
 {
 	KeepAlivePackage package;
-	while (true) sleep(10000);
 	while (true)
 	{
-		sleep(30);
+		sleep(120);
 		if (!getInstance().isRedistributing)
 			getInstance().broadcaster->send(&package);
 	}
@@ -592,13 +591,12 @@ void* Protocols::_keepAliveSender(void *)
 void* Protocols::_keepAliveMonitor(void *)
 {
 	int localAddr = conn::IPv4Address::getLocalAddress(0).sin_addr.s_addr;
-	while (true) sleep(10000);
 	while (true)
 	{
 		if (getInstance().isRedistributing)
 			continue;
 
-		int timeToSleep = 300; //sec;
+		int timeToSleep = 600; //sec;
 
 		pthread_mutex_lock(&getInstance().nodesMutex);
 
@@ -609,11 +607,11 @@ void* Protocols::_keepAliveMonitor(void *)
 			if (node.first == localAddr)
 				continue;
 
-			int leftTime = (node.second - getTime()) / 1000;
+			int leftTime = (node.second - getTime()) / 1000 + 600;
 
 			if (leftTime <= 0)
 			{
-				timeToSleep = 300;
+				timeToSleep = 600;
 				DeadbodyPackage deadbodyPackage;
 				deadbodyPackage.setAddress(node.first);
 
