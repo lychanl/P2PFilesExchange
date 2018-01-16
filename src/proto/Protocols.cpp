@@ -336,6 +336,7 @@ void Protocols::tcpHandler(conn::TCPConnection &conn)
 {
 	char* ID = new char[4];
 
+	Logger::getInstance().logDebug(std::to_string((unsigned long)ID));
 	if (conn.recv(ID, 4) != 0)
 	{
 		delete[] ID;
@@ -448,7 +449,7 @@ void Protocols::sendFile(files::Descriptor& descriptor, conn::TCPConnection& con
 
 void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& connection)
 {
-	std::string fileName = std::string("files") + descriptor.name;
+	std::string fileName = std::string("files/") + descriptor.name;
 
 	FILE* file = fopen(fileName.c_str(), "wb");
 
@@ -469,6 +470,8 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 		FilePackage filePackage;
 		if (connection.recvNoId(&filePackage) != 0)
 			break;
+
+		Logger::getInstance().logDebug("S: " + std::to_string(filePackage.getSize()) + " L: " + std::to_string(filePackage.getLeftSize()));
 
 		if (filePackage.getSize() > 0)
 		{
