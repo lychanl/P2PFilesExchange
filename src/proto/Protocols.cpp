@@ -584,9 +584,12 @@ void* Protocols::_keepAliveSender(void *)
 	KeepAlivePackage package;
 	while (true)
 	{
-		sleep(120);
+		sleep(30);
 		if (!getInstance().isRedistributing)
+		{
 			getInstance().broadcaster->send(&package);
+			getInstance().broadcastFilesList();
+		}
 	}
 }
 

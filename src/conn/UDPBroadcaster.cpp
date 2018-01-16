@@ -30,7 +30,7 @@ int UDPBroadcaster::open()
 
 		if (socket < 0)
 		{
-			Logger::getInstance().logError("UDPBroadcaster: Error while creating socket. Errno: " + errno);
+			Logger::getInstance().logError("UDPBroadcaster: Error while creating socket. Errno: " + std::to_string(errno));
 			pthread_mutex_unlock(&this->mutex);
 			return -1;
 		}
@@ -69,7 +69,7 @@ int UDPBroadcaster::send(const void *buffer, int size)
 		if (sendto(this->socket, buffer, size, 0, reinterpret_cast<sockaddr*>(&this->addr), sizeof(this->addr)) == size)
 			ret = 0;
 		else
-			Logger::getInstance().logError("UDPBroadcaster: Error while sending. Errno: " + errno);
+			Logger::getInstance().logError("UDPBroadcaster: Error while sending. Errno: " + std::to_string(errno));
 	}
 
 	pthread_mutex_unlock(&this->mutex);

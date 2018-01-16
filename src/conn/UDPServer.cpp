@@ -29,13 +29,13 @@ int UDPServer::GlobalUDPServer::initSocket()
 
 	if (ret < 0)
 	{
-		Logger::getInstance().logError("UDPServer: Error while creating socket. Errno: " + errno);
+		Logger::getInstance().logError("UDPServer: Error while creating socket. Errno: " + std::to_string(errno));
 		return -1;
 	}
 
 	if (::bind(ret, reinterpret_cast<sockaddr*>(&this->address), sizeof (this->address)) < 0)
 	{
-		Logger::getInstance().logError("UDPServer: Error while binding socket. Errno: " + errno);
+		Logger::getInstance().logError("UDPServer: Error while binding socket. Errno: " + std::to_string(errno));
 		::close(ret);
 		return -1;
 	}
@@ -61,7 +61,7 @@ int UDPServer::GlobalUDPServer::_run(int socketToRead)
 
 	if (read < 0)
 	{
-		Logger::getInstance().logError("UDPServer: Error while receiving. Errno: " + errno);
+		Logger::getInstance().logError("UDPServer: Error while receiving. Errno: " + std::to_string(errno));
 	}
 
 	if (read > 0)

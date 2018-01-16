@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <log/Logger.h>
+#include <fcntl.h>
 
 int connections = 0;
 pthread_mutex_t connectionsMutex;
@@ -18,28 +19,24 @@ TCPConnection::TCPConnection(int socket, const IPv4Address& address) : socket(so
 
 	pthread_mutex_unlock(&connectionsMutex);
 
-	struct timeval timeout;
-	timeout.tv_sec = 5;
-	timeout.tv_usec = 0;
-
-	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
+	int flags = fcntl(socket, F_GETFL, 0);
+	flags = flags & ~O_NONBLOCK;
+	fcntl(socket, F_SETFL, flags);
 }
 
 TCPConnection::TCPConnection(const IPv4Address& address) : remoteAddr(address)
 {
 	if (createSocket() != 0)
 	{
-		Logger::getInstance().logError("TCPConnection: Error while creating or binding socket. Errno: " + error);
+		Logger::getInstance().logError("TCPConnection: Error while creating or binding socket. Errno: " + std::to_string(error));
 		return;
 	}
 
-	struct timeval timeout;
-	timeout.tv_sec = 5;
-	timeout.tv_usec = 0;
-
-	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
-
 	connect();
+
+	int flags = fcntl(socket, F_GETFL, 0);
+	flags = flags & ~O_NONBLOCK;
+	fcntl(socket, F_SETFL, flags);
 }
 
 TCPConnection::~TCPConnection()
@@ -74,14 +71,20 @@ int TCPConnection::connect()
 {
 	pthread_mutex_lock(&connectionsMutex);
 
-	if (::connect(socket, reinterpret_cast<const sockaddr*>(&remoteAddr.getSockaddr()), sizeof(sockaddr_in)) != 0)
+	while (::connect(socket, reinterpret_cast<const sockaddr*>(&remoteAddr.getSockaddr()), sizeof(sockaddr_in)) != 0)
 	{
 		error = errno;
 		Logger::getInstance().logError("TCPConnection: Error while connecting. Errno: " + std::to_string(errno));
 		pthread_mutex_unlock(&connectionsMutex);
 
-		status = STATUS_FATAL;
-		return -1;
+		if (error != ETIMEDOUT && errno != ECONNREFUSED)
+		{
+			status = STATUS_FATAL;
+			return -1;
+		}
+		sleep(1);
+
+		pthread_mutex_lock(&connectionsMutex);
 	}
 
 	connections++;
@@ -160,7 +163,7 @@ int TCPConnection::send(const void *buffer, size_t n)
 		{
 			error = errno;
 
-			Logger::getInstance().logError("TCPConnection: Error while sending. Errno: " + error);
+			Logger::getInstance().logError("TCPConnection: Error while sending. Errno: " + std::to_string(error));
 
 			if (error == 11)
 				sent = 0;
@@ -204,7 +207,7 @@ int TCPConnection::recv(void *buffer, size_t n)
 
 	while (left > 0)
 	{
-		received = ::recv(socket, buffer, left, 0);
+		received = ::recv(socket, buffer, left, MSG_WAITALL);
 		if (received < 0)
 		{
 			error = errno;
