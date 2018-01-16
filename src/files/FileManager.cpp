@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <log/Logger.h>
 #include <sys/stat.h>
+#include <algorithm>
 #include "FileManager.h"
 
 using namespace files;
@@ -187,6 +188,7 @@ int FileManager::removeRemoteFilesFromNode(const conn::IPv4Address &node)
 	pthread_rwlock_wrlock(&fileListLock);
 	Logger::getInstance().logDebug(std::string("FileManager: removing descriptors from node: ") + std::string(node));
 	fileList.deleteFromNode(node.getAddress());
+	listDates.erase(node.getAddress());
 	pthread_rwlock_unlock(&fileListLock);
 	return 0;
 }
@@ -336,4 +338,27 @@ bool FileManager::isActive(const Descriptor &localFile)
 const std::string &FileManager::getFileDir() const
 {
     return fileList.getFileDir();
+}
+
+int FileManager::setActiveNodes(std::set<unsigned int> nodes)
+{
+	pthread_rwlock_wrlock(&fileListLock);
+	std::vector<unsigned int> nodesToDelete;
+	for (auto it : listDates)
+	{
+		if(nodes.find(it.first) == nodes.end())
+		{
+			nodesToDelete.push_back(it.first);
+		}
+	}
+
+	for (auto it : nodesToDelete)
+	{
+		Logger::getInstance().logDebug(std::string("FileManager: removing descriptors from node: ") + std::string(conn::IPv4Address(it)));
+		fileList.deleteFromNode(it);
+		listDates.erase(it);
+	}
+
+	pthread_rwlock_unlock(&fileListLock);
+	return 0;
 }
