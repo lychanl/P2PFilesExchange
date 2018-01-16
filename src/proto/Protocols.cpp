@@ -475,9 +475,7 @@ void Protocols::receiveFile(files::Descriptor& descriptor, conn::TCPConnection& 
 
 		if (filePackage.getSize() > 0)
 		{
-			int ret = fwrite(filePackage.getDataPtr(), filePackage.getSize(), 1, file);
-			Logger::getInstance().logDebug(std::string("Written ") + std::to_string(ret) + " bytes to file");
-			Logger::getInstance().logMessage(std::string((char*)filePackage.getDataPtr()));
+			fwrite(filePackage.getDataPtr(), filePackage.getSize(), 1, file);
 		}
 
 		if (filePackage.getSize() == filePackage.getLeftSize())

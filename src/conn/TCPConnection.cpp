@@ -159,14 +159,16 @@ int TCPConnection::send(const void *buffer, size_t n)
 		if (sent < 0)
 		{
 			error = errno;
-			status = STATUS_ERR;
 
 			Logger::getInstance().logError("TCPConnection: Error while sending. Errno: " + error);
 
 			if (error == 11)
 				sent = 0;
 			else
+			{
+				status = STATUS_ERR;
 				return -1;
+			}
 		}
 
 		left -= sent;
