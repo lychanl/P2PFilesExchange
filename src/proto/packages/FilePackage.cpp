@@ -28,7 +28,7 @@ void FilePackage::parseData()
 {
 	this->ownData = true;
 	this->data = new char[this->size];
-	strncpy((char*)this->data, (char*)getData(16), this->size);
+	memcpy(this->data, getData(16), this->size);
 }
 
 void FilePackage::serialize()
