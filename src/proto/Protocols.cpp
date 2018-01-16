@@ -181,7 +181,7 @@ void* Protocols::_uploadFile(void* arg)
 			return nullptr;
 		}
 
-		FILE *stream = fdopen(fd, "r");
+		FILE *stream = fdopen(fd, "rb");
 
 		fseek(stream, 0, SEEK_END);
 		int leftSize = ftell(stream);
@@ -417,7 +417,7 @@ void Protocols::sendFile(files::Descriptor& descriptor, conn::TCPConnection& con
 		return;
 	}
 
-	FILE* fstream = fdopen(fd, "r");
+	FILE* fstream = fdopen(fd, "rb");
 	fseek(fstream, 0, SEEK_END);
 	int leftSize = ftell(fstream);
 	rewind(fstream);
