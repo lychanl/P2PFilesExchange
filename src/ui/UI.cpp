@@ -213,14 +213,16 @@ int UI::Parser::downloadFile(string fileSrc, string fileDst)
 
             string path = fileDst.substr(0, fileDst.length() - strlen(base));
 
-
-            system(("mkdir -p "+ path).c_str());
+            if (!path.empty()){
+                system(("mkdir -p "+ path).c_str());
+            }
 
             std::vector<files::Descriptor> local = fileManager->listLocalFiles();
 
             if (std::count(local.begin(), local.end(), a) > 0)
             {
-                std::ifstream  src(strncat(const_cast<char *>(fileManager->getFileDir().c_str()), fileSrc.c_str(), fileSrc.length()), std::ios::binary);
+                Logger::getInstance().logDebug("SRC: " + (fileManager->getFileDir()+"/"+fileSrc));
+                std::ifstream  src((fileManager->getFileDir()+"/"+fileSrc), std::ios::binary);
                 std::ofstream  dst(fileDst, std::ios::binary);
 
                 dst << src.rdbuf();
